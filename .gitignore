@@ -1,0 +1,6 @@
+.virtualenv/
+!.idea/
+.idea/*
+!.idea/runConfigurations
+*.pyc
+*.DS_Store
