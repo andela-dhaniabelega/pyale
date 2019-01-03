@@ -86,6 +86,7 @@ class Property(models.Model):
     description = models.TextField()
     specs = ArrayField(models.CharField(max_length=512))
     title = models.CharField(unique=True, max_length=512)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title

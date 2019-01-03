@@ -2,6 +2,8 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
+from core.models import Property
+
 User = get_user_model()
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -69,3 +71,9 @@ class UserLoginSerializer(serializers.Serializer):
         else:
             msg = 'Username and Password are required'
             raise serializers.ValidationError(msg)
+
+
+class PropertySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Property
+        fields = '__all__'
