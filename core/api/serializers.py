@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
-from core.models import Property
+from core.models import Property, PropertyImage
 
 User = get_user_model()
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -73,7 +73,15 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(msg)
 
 
+class PropertyImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyImage
+        fields = '__all__'
+
+
 class PropertySerializer(serializers.ModelSerializer):
+    property_images = PropertyImageSerializer(read_only=True, many=True)
+
     class Meta:
         model = Property
-        fields = '__all__'
+        fields = ("id", "category", "total_cost", "description", "specs", "title", "is_active", "property_images")

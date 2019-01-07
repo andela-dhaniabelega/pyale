@@ -1,10 +1,15 @@
 import re
 
+import cloudinary
+import cloudinary.uploader
+from dirtyfields import DirtyFieldsMixin
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from cloudinary.models import CloudinaryField
+
+from core.utils import get_public_id_from_url
 
 
 class UserManager(BaseUserManager):
@@ -70,9 +75,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.email and not re.match(email_pattern, self.email):
             raise ValidationError("Invalid Email")
 
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Tenants'
+
 
 class Property(models.Model):
-
     PROPERTY_CATEGORIES = (
         ('Residential', 'residential'),
         ('Commercial', 'commercial')
@@ -85,32 +93,63 @@ class Property(models.Model):
     total_cost = models.CharField(max_length=512)
     description = models.TextField()
     specs = ArrayField(models.CharField(max_length=512))
-    title = models.CharField(unique=True, max_length=512)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.title
-
-
-class PropertyImage(models.Model):
-    realty = models.ForeignKey(Property, on_delete=models.CASCADE)
-    image = CloudinaryField('image')
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(unique=True, max_length=512)
 
     def __str__(self):
         return self.name
 
+    def delete(self, using=None, keep_parents=False):
+        property_images = PropertyImage.objects.filter(realty_id=self.id)
+        if property_images is not None:
+            for property_image in property_images:
+                public_id = get_public_id_from_url(property_image.image.url)
+                cloudinary.uploader.destroy(public_id)
+        super().delete()
 
-class Tenant(models.Model):
-    bio = models.ForeignKey(User, on_delete=models.CASCADE)
+    class Meta:
+        verbose_name = 'Property'
+        verbose_name_plural = 'Properties'
+
+
+class PropertyImage(DirtyFieldsMixin, models.Model):
+    realty = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_images")
+    image = CloudinaryField('image')
+    tag = models.CharField(
+        max_length=255,
+        unique=True,
+        help_text="A unique identifier for an image"
+    )
 
     def __str__(self):
-        return " ".join([self.bio.first_name, self.bio.last_name])
+        return self.tag
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.full_clean()
+        if self._state.adding:
+            new_image = cloudinary.uploader.upload(self.image)
+            self.image = new_image['url']
+        else:
+            modified_fields = self.get_dirty_fields()
+            if 'image' in modified_fields:
+                # Remove existing image from Cloudinary
+                public_id = get_public_id_from_url(self._original_state['image'].url)
+                cloudinary.uploader.destroy(public_id)
+
+                # Save new Image
+                new_image = cloudinary.uploader.upload(self.image)
+                self.image = new_image['url']
+        super().save()
+
+    def delete(self, using=None, keep_parents=False):
+        public_id = get_public_id_from_url(self.image.url)
+        cloudinary.uploader.destroy(public_id)
+        super().delete()
 
 
-class TenantDocument(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
-    document = models.FileField()
+class TenantDocument(DirtyFieldsMixin, models.Model):
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE)
+    document = CloudinaryField()
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     name = models.CharField(unique=True, max_length=255)
@@ -118,16 +157,45 @@ class TenantDocument(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.full_clean()
+        if self._state.adding:
+            new_document = cloudinary.uploader.upload(
+                self.document,
+                resource_type="raw"
+            )
+            self.document = new_document['url']
+        else:
+            modified_fields = self.get_dirty_fields()
+            if 'document' in modified_fields:
+                # Remove existing image from Cloudinary
+                original_document = self._original_state['document']
+                public_id = get_public_id_from_url(original_document.url)
+                cloudinary.uploader.destroy(f"{public_id}.{original_document.format}", resource_type="raw")
+
+                # Save new Image
+                new_document = cloudinary.uploader.upload(
+                    self.document,
+                    resource_type="raw"
+                )
+                self.document = new_document['url']
+        super().save()
+
+    def delete(self, using=None, keep_parents=False):
+        public_id = get_public_id_from_url(self.document.url)
+        cloudinary.uploader.destroy(f"{public_id}.{self.document.format}", resource_type="raw")
+        super().delete()
+
 
 class Letting(models.Model):
-
     PAYMENT_SCHEDULE_TYPES = (
         ('Annual', 'annual'),
         ('Quarterly', 'quarterly'),
         ('Monthly', 'monthly')
     )
 
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE)
     realty = models.ForeignKey(Property, on_delete=models.CASCADE)
     letting_type = models.CharField(max_length=50)
     letting_start_date = models.DateField()
@@ -144,7 +212,7 @@ class Letting(models.Model):
     )
 
     def __str__(self):
-        return " ".join([self.tenant.bio.first_name, self.tenant.bio.last_name])
+        return " ".join([self.tenant.first_name, self.tenant.last_name])
 
 
 class PaymentSchedule(models.Model):
@@ -156,13 +224,13 @@ class PaymentSchedule(models.Model):
     payment_cycle = models.CharField(max_length=100)
 
     def __str__(self):
-        return " ".join([self.letting.tenant.bio.first_name, self.letting.tenant.bio.last_name])
+        return " ".join([self.letting.tenant.first_name, self.letting.tenant.last_name])
 
 
 class Payment(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE)
     payment_reference = models.CharField(max_length=255)
     payment_date = models.DateTimeField()
 
     def __str__(self):
-        return " ".join([self.tenant.bio.first_name, self.tenant.bio.last_name])
+        return " ".join([self.tenant.first_name, self.tenant.last_name])

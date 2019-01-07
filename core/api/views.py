@@ -1,10 +1,14 @@
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 from rest_framework import status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 
-from core.api.serializers import UserRegisterSerializer, UserLoginSerializer, PropertySerializer
-from core.models import Property
+from core.api.serializers import UserRegisterSerializer, UserLoginSerializer, PropertySerializer, \
+    PropertyImageSerializer
+from core.models import Property, PropertyImage
 from core.utils import IsSuperUser
 
 
@@ -54,7 +58,7 @@ class PropertyList(generics.ListCreateAPIView):
     """
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
-    permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = (permissions.IsAuthenticated, IsSuperUser)
 
 
 class PropertyDetails(generics.RetrieveUpdateDestroyAPIView):
@@ -65,8 +69,58 @@ class PropertyDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PropertySerializer
     permission_classes = (permissions.IsAuthenticated, IsSuperUser,)
 
-    def delete(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         obj = Property.objects.get(pk=kwargs['pk'])
         obj.is_active = False
         obj.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PropertyImageList(generics.ListCreateAPIView):
+    """
+    Add or List Property Images
+    """
+    queryset = PropertyImage.objects.all()
+    serializer_class = PropertyImageSerializer
+    permission_classes = (permissions.IsAuthenticated, IsSuperUser,)
+
+    def create(self, request, *args, **kwargs):
+        serializer = PropertyImageSerializer(data=request.data)
+        if serializer.is_valid():
+            res = cloudinary.uploader.upload(request.FILES['file'])
+            serializer.save(image=res["url"])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PropertyImageDetails(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PropertyImage.objects.all()
+    serializer_class = PropertyImageSerializer
+    permission_classes = (permissions.IsAuthenticated, IsSuperUser,)
+
+    def destroy(self, request, *args, **kwargs):
+        obj = PropertyImage.objects.get(pk=kwargs['pk'])
+        public_id = self.get_public_id_from_url(obj['url'])
+        cloudinary.uploader.destroy(public_id)
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # def partial_update(self, request, *args, **kwargs):
+    #     obj = PropertyImage.objects.get(pk=kwargs['pk'])
+    #     serializer = PropertyImageSerializer(obj, data=request.data, partial=True)
+    #     if serializer.is_valid():
+    #         if 'url' in request.data.keys():
+    #             res = cloudinary.uploader.upload(request.FILES['file'])
+    #             serializer.save(image=res["url"])
+    #         else:
+    #             serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_public_id_from_url(self, url):
+        public_id_extension = url.split("/")[-1]
+        public_id = public_id_extension.split(".")[0]
+        return public_id
+

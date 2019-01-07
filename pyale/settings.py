@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import datetime
 import os
 
+import cloudinary
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -42,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'cloudinary',
     'corsheaders',
     'core'
 ]
@@ -139,12 +145,6 @@ ACCOUNT_LOGOUT_ON_GET = True
 
 AUTH_USER_MODEL = 'core.User'
 
-# REST_AUTH_SERIALIZERS = {
-#     "USER_DETAILS_SERIALIZER": "users.serializers.CustomUserDetailsSerializer",
-# }
-# REST_AUTH_REGISTER_SERIALIZERS = {
-#     "REGISTER_SERIALIZER": "users.serializers.CustomRegisterSerializer",
-# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -163,3 +163,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Cloudinary Configuration
+
+cloudinary.config(
+    cloud_name=os.getenv("PYALE_CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("PYALE_CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("PYALE_CLOUDINARY_API_SECRET")
+)

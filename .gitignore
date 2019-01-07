@@ -4,3 +4,4 @@
 !.idea/runConfigurations
 *.pyc
 *.DS_Store
+.env
