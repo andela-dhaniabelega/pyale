@@ -1,3 +1,4 @@
+import logging
 import re
 
 import cloudinary
@@ -7,9 +8,14 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 from cloudinary.models import CloudinaryField
+import pendulum
 
-from core.utils import get_public_id_from_url
+from core.utils import get_public_id_from_url, get_years_cycles_from_date_range, compute_period_from_date_range
+
+logger = logging.getLogger(__name__)
 
 
 class UserManager(BaseUserManager):
@@ -188,24 +194,33 @@ class TenantDocument(DirtyFieldsMixin, models.Model):
         super().delete()
 
 
-class Letting(models.Model):
+class Letting(DirtyFieldsMixin, models.Model):
     PAYMENT_SCHEDULE_TYPES = (
         ('Annual', 'annual'),
         ('Quarterly', 'quarterly'),
         ('Monthly', 'monthly')
     )
+    TOTAL_LETTING_COST = 'total_letting_cost'
+    LETTING_START_DATE = 'letting_start_date'
+    LETTING_DURATION = 'letting_duration'
+    SCHEDULE_TYPE = 'schedule_type'
+    ANNUAL = 'annual'
+    QUARTERLY = 'quarterly'
+    MONTHLY = 'monthly'
+    MAX_LETTING_DURATION = 5
 
     tenant = models.ForeignKey(User, on_delete=models.CASCADE)
     realty = models.ForeignKey(Property, on_delete=models.CASCADE)
     letting_type = models.CharField(max_length=50)
+    letting_duration = models.IntegerField(default="0", help_text="Letting period (must be in years)")
     letting_start_date = models.DateField()
-    letting_end_date = models.DateField()
+    letting_end_date = models.DateField(editable=False)
     deposit = models.CharField(max_length=512)
     deposit_refunded = models.BooleanField(null=True, blank=True)
-    deposit_refund_date = models.DateTimeField(null=True, blank=True)
+    deposit_refund_date = models.DateField(null=True, blank=True)
     total_letting_cost = models.CharField(max_length=512, help_text="Total Cost for the letting period")
     service_charge = models.CharField(max_length=100)
-    payment_schedule = models.CharField(
+    schedule_type = models.CharField(
         max_length=100,
         help_text="Monthly, Quarterly or Annually",
         choices=PAYMENT_SCHEDULE_TYPES
@@ -214,14 +229,101 @@ class Letting(models.Model):
     def __str__(self):
         return " ".join([self.tenant.first_name, self.tenant.last_name])
 
+    def clean(self):
+        letting_start_date = pendulum.datetime(self.letting_start_date.year, self.letting_start_date.month,
+                                               self.letting_start_date.day)
+
+        current_date = pendulum.now().date()
+
+        if letting_start_date.date() < current_date:
+            raise ValidationError("Letting start date cannot be earlier than current date")
+
+        if self.letting_duration > self.MAX_LETTING_DURATION:
+            raise ValidationError("Maximum Letting Duration is {}".format(self.MAX_LETTING_DURATION))
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.full_clean()
+
+        letting_start_date = pendulum.datetime(self.letting_start_date.year, self.letting_start_date.month,
+                                               self.letting_start_date.day)
+        self.letting_end_date = letting_start_date.add(years=self.letting_duration).subtract(days=1).date()
+
+        modified_fields = self.get_dirty_fields()
+        fields_requiring_schedule_update = {self.TOTAL_LETTING_COST, self.LETTING_DURATION, self.SCHEDULE_TYPE}
+
+        if any(field in fields_requiring_schedule_update for field in modified_fields) and self.id is not None:
+            if self.LETTING_START_DATE in modified_fields:
+                raise ValidationError("You cannot edit the start date of an ongoing letting")
+
+            # Calculate new letting end date if duration is changed
+            self.letting_end_date = letting_start_date.add(years=self.letting_duration).subtract(days=1).date()
+
+            # Deactivate old schedule
+            PaymentSchedule.objects.filter(letting_id=self.id).update(active_schedule=False)
+
+            # Create new schedule
+            self.create_payment_schedule(self.schedule_type, self.total_letting_cost, self.letting_start_date,
+                                         self.letting_end_date.add(days=1).date())
+        super().save()
+
+    def create_payment_schedule(self, schedule_type, total_letting_cost, start_date, end_date):
+        payment_schedules = {
+            'annual': self.create_annual_schedule,
+            'quarterly': self.create_quarterly_schedule,
+            'monthly': self.create_monthly_schedule
+        }
+        payment_schedules[schedule_type.lower()](total_letting_cost, start_date, end_date)
+
+    def create_annual_schedule(self, total_letting_cost, start_date, end_date):
+        period, cycles = get_years_cycles_from_date_range(start_date, end_date)
+        amount_per_year = int(total_letting_cost) / period.years
+        new_payment_schedule = [
+            PaymentSchedule(
+                letting_id=self.id,
+                amount_due=amount_per_year,
+                payment_status=False,
+                payment_cycle=cycle
+            ) for cycle in cycles
+        ]
+        PaymentSchedule.objects.bulk_create(new_payment_schedule)
+
+    def create_quarterly_schedule(self, total_letting_cost, start_date, end_date):
+        quarters = compute_period_from_date_range(start_date, end_date, period="quarter")
+        amount_per_quarter = int(total_letting_cost) / len(quarters)
+        new_payment_schedule = [
+            PaymentSchedule(
+                letting_id=self.id,
+                amount_due=amount_per_quarter,
+                payment_status=False,
+                payment_cycle="{from_date} to {to_date}".format(from_date=quarter[0], to_date=quarter[1])
+            ) for quarter in quarters
+        ]
+        PaymentSchedule.objects.bulk_create(new_payment_schedule)
+
+    def create_monthly_schedule(self, total_letting_cost, start_date, end_date):
+        months = compute_period_from_date_range(start_date, end_date, period="month")
+        amount_per_month = int(total_letting_cost) / len(months)
+        new_payment_schedule = [
+            PaymentSchedule(
+                letting_id=self.id,
+                amount_due=amount_per_month,
+                payment_status=False,
+                payment_cycle="{from_date} to {to_date}".format(from_date=month[0], to_date=month[1])
+            ) for month in months
+        ]
+        PaymentSchedule.objects.bulk_create(new_payment_schedule)
+
 
 class PaymentSchedule(models.Model):
     letting = models.ForeignKey(Letting, on_delete=models.CASCADE)
     amount_due = models.CharField(max_length=512,
                                   help_text="The amount to be paid per cycle e.g. the amount per month or per quarter")
     payment_status = models.BooleanField()
-    payment_date = models.DateTimeField(null=True, blank=True)
+    payment_date = models.DateField(null=True, blank=True)
     payment_cycle = models.CharField(max_length=100)
+    tag = models.CharField(default="Rent", max_length=255)
+    active_schedule = models.BooleanField(default=True)
 
     def __str__(self):
         return " ".join([self.letting.tenant.first_name, self.letting.tenant.last_name])
@@ -230,7 +332,26 @@ class PaymentSchedule(models.Model):
 class Payment(models.Model):
     tenant = models.ForeignKey(User, on_delete=models.CASCADE)
     payment_reference = models.CharField(max_length=255)
-    payment_date = models.DateTimeField()
+    payment_date = models.DateField()
 
     def __str__(self):
         return " ".join([self.tenant.first_name, self.tenant.last_name])
+
+
+@receiver(post_save, sender=Letting)
+def payment_schedule(sender, **kwargs):
+    if kwargs.get('created'):
+        instance = kwargs.get('instance')
+
+        # Create Schedule for service charge
+        PaymentSchedule.objects.create(
+            letting=instance,
+            amount_due=instance.service_charge,
+            payment_status=False,
+            payment_cycle="Annual",
+            tag="Service Charge"
+        )
+
+        # Create Schedule for Rent
+        instance.create_payment_schedule(instance.schedule_type, instance.total_letting_cost,
+                                         instance.letting_start_date, instance.letting_end_date.add(days=1))
