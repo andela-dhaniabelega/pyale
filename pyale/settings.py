@@ -40,6 +40,7 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 INSTALLED_APPS = [
+    'core.apps.SuitConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,7 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'cloudinary',
     'corsheaders',
-    'core'
+    'core',
+    'djmoney'
 ]
 
 MIDDLEWARE = [
@@ -87,7 +89,7 @@ ROOT_URLCONF = 'pyale.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'core/templates/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -151,13 +153,16 @@ AUTH_USER_MODEL = 'core.User'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
+
+DEFAULT_CURRENCY = "NGN"
+CURRENCIES = ('NGN',)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -171,3 +176,15 @@ cloudinary.config(
     api_key=os.getenv("PYALE_CLOUDINARY_API_KEY"),
     api_secret=os.getenv("PYALE_CLOUDINARY_API_SECRET")
 )
+
+SUIT_CONFIG = {
+    'ADMIN_NAME': 'Pyale Properties'
+}
+
+# EMAIL SETTINGS
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'pyaleproperties@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('PYALE_EMAIL_HOST_PASSWORD')

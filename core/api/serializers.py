@@ -13,6 +13,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     """
     Serializer to register a new user
     """
+
     def validate(self, attrs):
         instance = User(**attrs)
         instance.clean()
@@ -21,62 +22,60 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = self.Meta.model(**validated_data)
         if all(validated_data.values()):
-            password = validated_data.pop('password', None)
+            password = validated_data.pop("password", None)
             instance.set_password(password)
         instance.save()
         return instance
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password',)
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ("first_name", "last_name", "email", "password")
+        extra_kwargs = {"password": {"write_only": True}}
 
 
 class UserLoginSerializer(serializers.Serializer):
     """
     Serializer used to validate an email and password
     """
+
     email = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
 
-        credentials = {
-            'email': attrs.get('email'),
-            'password': attrs.get('password')
-        }
+        credentials = {"email": attrs.get("email"), "password": attrs.get("password")}
 
         if all(credentials.values()):
             user = authenticate(**credentials)
 
             if user:
                 if not user.is_active:
-                    msg = 'User account disabled'
+                    msg = "User account disabled"
                     raise serializers.ValidationError(msg)
 
                 payload = jwt_payload_handler(user)
                 token = jwt_encode_handler(payload)
                 return {
-                    'user': {
-                        'id': user.id,
-                        'email': user.email,
-                        'first_name': user.first_name,
-                        'last_name': user.last_name
+                    "user": {
+                        "id": user.id,
+                        "email": user.email,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
                     },
-                    'token': token
+                    "token": token,
                 }
             else:
-                msg = 'Incorrect username or password'
+                msg = "Incorrect username or password"
                 raise serializers.ValidationError(msg)
         else:
-            msg = 'Username and Password are required'
+            msg = "Username and Password are required"
             raise serializers.ValidationError(msg)
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
-        fields = '__all__'
+        fields = "__all__"
 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -84,4 +83,13 @@ class PropertySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Property
-        fields = ("id", "category", "total_cost", "description", "specs", "title", "is_active", "property_images")
+        fields = (
+            "id",
+            "category",
+            "total_cost",
+            "description",
+            "specs",
+            "title",
+            "is_active",
+            "property_images",
+        )

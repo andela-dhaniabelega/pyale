@@ -6,8 +6,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 
-from core.api.serializers import UserRegisterSerializer, UserLoginSerializer, PropertySerializer, \
-    PropertyImageSerializer
+from core.api.serializers import (
+    UserRegisterSerializer,
+    UserLoginSerializer,
+    PropertySerializer,
+    PropertyImageSerializer,
+)
 from core.models import Property, PropertyImage
 from core.utils import IsSuperUser
 
@@ -18,6 +22,7 @@ class UserRegister(APIView):
     :param
     :return
     """
+
     permission_classes = []
     serializer_class = UserRegisterSerializer
 
@@ -29,10 +34,7 @@ class UserRegister(APIView):
             user = serializer.save()
             payload = jwt_payload_handler(user)
             token = jwt_encode_handler(payload)
-            data = {
-                'user': serializer.data,
-                'token': token
-            }
+            data = {"user": serializer.data, "token": token}
             return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -42,6 +44,7 @@ class UserLogin(APIView):
     """
     Implements User Login
     """
+
     permission_classes = []
 
     def post(self, request, format=None):
@@ -56,6 +59,7 @@ class PropertyList(generics.ListCreateAPIView):
     """
     Create New Property or List Existing Properties
     """
+
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
     permission_classes = (permissions.IsAuthenticated, IsSuperUser)
@@ -65,12 +69,13 @@ class PropertyDetails(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, Update or Destroy a given property
     """
+
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
-    permission_classes = (permissions.IsAuthenticated, IsSuperUser,)
+    permission_classes = (permissions.IsAuthenticated, IsSuperUser)
 
     def destroy(self, request, *args, **kwargs):
-        obj = Property.objects.get(pk=kwargs['pk'])
+        obj = Property.objects.get(pk=kwargs["pk"])
         obj.is_active = False
         obj.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -123,4 +128,3 @@ class PropertyDetails(generics.RetrieveUpdateDestroyAPIView):
 #         public_id_extension = url.split("/")[-1]
 #         public_id = public_id_extension.split(".")[0]
 #         return public_id
-

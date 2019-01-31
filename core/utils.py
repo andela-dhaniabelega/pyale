@@ -1,3 +1,5 @@
+import random
+import string
 from datetime import datetime
 
 from django.http import Http404
@@ -34,6 +36,7 @@ class IsSuperUser(permissions.BasePermission):
 #             result.append([quarter, year])
 #     return result
 
+
 def create_pendulum_date(start_date, end_date):
     start_date = pendulum.datetime(start_date.year, start_date.month, start_date.day)
     end_date = pendulum.datetime(end_date.year, end_date.month, end_date.day)
@@ -49,16 +52,15 @@ def compute_period_from_date_range(start_date, end_date, period=None):
     :param period:
     :return: A list of tuples containing quarters
     """
-    periods = {
-        'quarter': 3,
-        'month': 1
-    }
+    periods = {"quarter": 3, "month": 1}
     dates = []
     start_date, end_date = create_pendulum_date(start_date, end_date)
 
     while start_date < end_date:
         new_date = start_date.add(months=periods[period])
-        dates.append((start_date.date(), new_date.subtract(days=1).date()))  # End dt should be a day less than start dt
+        dates.append(
+            (start_date.date(), new_date.subtract(days=1).date())
+        )  # End dt should be a day less than start dt
         start_date = new_date
 
     return dates
@@ -96,3 +98,13 @@ def get_years_cycles_from_date_range(start_date, end_date):
         start_date = new_start
 
     return period, cycles
+
+
+def generate_random_string(size=8, chars=string.ascii_uppercase + string.digits):
+    """
+    Generate Random String
+    :param size: Length of string to be generated
+    :param chars: The chars from which to pick the string
+    :return:
+    """
+    return "".join(random.SystemRandom().choice(chars) for _ in range(size))
