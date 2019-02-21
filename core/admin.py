@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from django.forms import ModelForm, PasswordInput
+from django.forms import ModelForm
 from core import models
 
 
@@ -35,6 +35,9 @@ class PaymentScheduleInline(admin.TabularInline):
     model = models.PaymentSchedule
     extra = 0
     classes = ["collapse"]
+    verbose_name = "Payment Schedule"
+    verbose_name_plural = "Payment Schedules"
+    readonly_fields = ("amount_due",)
 
 
 class LettingAdmin(admin.ModelAdmin):
@@ -45,19 +48,43 @@ class LettingInline(admin.TabularInline):
     model = models.Letting
     extra = 0
     classes = ["collapse"]
-    readonly_fields = ("changeform_link",)
+    fields = (
+        "type",
+        "letting_duration",
+        "start_date",
+        "end_date",
+        "amount_paid",
+        "amount_outstanding",
+        "cost",
+        "schedule_type",
+        "changeform_link",
+    )
+    readonly_fields = (
+        "changeform_link",
+        "type",
+        "letting_duration",
+        "start_date",
+        "end_date",
+        "amount_paid",
+        "amount_outstanding",
+        "cost",
+        "schedule_type",
+    )
 
     def changeform_link(self, instance):
         if instance.id:
-            # Replace "myapp" with the name of the app containing
-            # your Certificate model:
             changeform_url = reverse("admin:core_letting_change", args=(instance.id,))
-            return mark_safe(u'<a href="{u}">Details</a>'.format(u=changeform_url))
+            return mark_safe('<a href="{u}">Details</a>'.format(u=changeform_url))
             # return u'<a href="%s" target="_blank">Details</a>' % changeform_url
-        return u""
+        return ""
+
+    def letting_duration(self, instance):
+        if instance.duration:
+            return f"{instance.duration} month(s)"
 
     changeform_link.allow_tags = True
     changeform_link.short_description = ""
+    letting_duration.short_description = "Duration"
 
 
 class TenantDocumentInline(admin.TabularInline):
@@ -82,29 +109,31 @@ class LettingAdmin(admin.ModelAdmin):
     inlines = [PaymentScheduleInline]
     list_display = (
         "get_tenant_name",
-        "letting_type",
+        "type",
         "letting_duration",
-        "letting_start_date",
-        "letting_end_date",
+        "start_date",
+        "end_date",
+        "amount_paid",
+        "amount_outstanding",
+        "cost",
+        "schedule_type",
     )
     search_fields = ["tenant__first_name", "tenant__last_name"]
 
     def get_tenant_name(self, obj):
         return " ".join([obj.tenant.first_name, obj.tenant.last_name])
 
+    def letting_duration(self, instance):
+        if instance.duration:
+            return f"{instance.duration} month(s)"
+
     get_tenant_name.short_description = "Tenant Name"
     get_tenant_name.admin_order_field = "tenant"
+    letting_duration.short_description = "Duration"
 
 
 class PaymentScheduleAdmin(admin.ModelAdmin):
-    list_display = (
-        "get_tenant_name",
-        "amount_due",
-        "payment_cycle",
-        "tag",
-        "active_schedule",
-        "payment_status",
-    )
+    list_display = ("get_tenant_name", "amount_due", "payment_cycle", "tag", "active_schedule", "payment_status")
     search_fields = ["letting__tenant__first_name", "letting__tenant__last_name"]
     list_filter = ("active_schedule", "tag", "payment_status")
     readonly_fields = ("amount_due", "tag", "payment_cycle")
@@ -122,8 +151,22 @@ class AdminUserForm(ModelForm):
         fields = ("first_name", "last_name", "email", "is_active", "is_superuser")
 
 
+class TenantCommentAdmin(admin.ModelAdmin):
+    list_display = ("get_tenant_name", "comment", "date_added")
+    search_fields = ["tenant__first_name", "tenant__last_name"]
+
+    def get_tenant_name(self, obj):
+        return " ".join([obj.tenant.first_name, obj.tenant.last_name])
+
+
+class TenantCommentInline(admin.TabularInline):
+    model = models.TenantComment
+    extra = 0
+    classes = ["collapse"]
+
+
 class UserAdmin(admin.ModelAdmin):
-    inlines = [LettingInline, TenantDocumentInline]
+    inlines = [LettingInline, TenantDocumentInline, TenantCommentInline]
     list_display = ("get_tenant_name", "email", "is_active")
     search_fields = ["first_name", "last_name", "email"]
     list_filter = ("is_active",)
@@ -131,6 +174,13 @@ class UserAdmin(admin.ModelAdmin):
 
     def get_tenant_name(self, obj):
         return " ".join([obj.first_name, obj.last_name])
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        tenant_comments = models.TenantComment.objects.filter(tenant_id=object_id)
+        extra_context["tenant_comments"] = tenant_comments
+        extra_context["user"] = request.user
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
     get_tenant_name.short_description = "First Name/Last Name"
 
@@ -143,6 +193,7 @@ admin.site.register(models.Letting, LettingAdmin)
 admin.site.register(models.PaymentSchedule, PaymentScheduleAdmin)
 admin.site.register(models.PropertyDocument)
 admin.site.register(models.PropertyRunningCosts)
+admin.site.register(models.TenantComment, TenantCommentAdmin)
 
 admin.site.site_header = "Pyale Properties"
 admin.site.site_title = "Pyale Properties"
