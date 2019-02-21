@@ -1,0 +1,24 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+{% block object-tools-items %}
+    <li>
+        <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% trans "History" %}</a>
+    </li>
+    <li>
+        <div href="mylink/" style="margin-top: 5px; height: 500px; background: #f3f3f3; padding: 5px; overflow: scroll">
+            <h3 style="text-align: center;">Latest Comments</h3>
+            <ul style="list-style-type: none; padding: 6px">
+                {% for tenant_comment in tenant_comments %}
+                    <li>{{ tenant_comment.comment }}</li>
+                    <span style="color: #4799DB">Added on {{ tenant_comment.date_added }} by {{ user }}</span>
+                    <br/><br/>
+                {% endfor %}
+            </ul>
+        </div>
+    </li>
+    {% if has_absolute_url %}
+        <li>
+            <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a>
+        </li>
+    {% endif %}
+{% endblock %}
