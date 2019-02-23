@@ -3,14 +3,20 @@ import SocialMedia from './components/SocialMedia';
 import Footer from './components/Footer';
 import FooterLinks from './components/FooterLinks';
 import Aux from './hoc/Aux_'
-import Header from "./components/Header";
+import Navbar from "./components/Navbar";
 
 
 class Properties extends React.Component {
     render() {
         return (
             <Aux>
-                <Header/>
+                <Navbar/>
+                <section className="section section-lg bg-web-desc">
+                    <div className="bg-overlay"></div>
+                    <div className="bg-pattern-effect">
+                        <img src="images/bg-pattern.png" alt=""/>
+                    </div>
+                </section>
                 <section className="section" id="features">
                     <div className="container">
                         <div className="row">

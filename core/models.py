@@ -48,8 +48,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    _temp_password = None
-
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
@@ -60,6 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     temp_password_expiry = models.DateTimeField(null=True, blank=True)
+    temp_password = models.CharField(max_length=50, null=True, blank=True)
 
     objects = UserManager()
 
@@ -87,8 +86,9 @@ class User(AbstractBaseUser, PermissionsMixin):
             raise ValidationError("Invalid Email")
 
     def save(self, *args, **kwargs):
-        self._temp_password = generate_random_string()
-        self.set_password(self._temp_password)
+        if self._state.adding and not self.is_superuser:
+            self.temp_password = generate_random_string()
+            self.set_password(self.temp_password)
         super().save()
 
     class Meta:

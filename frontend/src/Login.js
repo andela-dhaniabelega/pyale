@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux'
 
 import { login } from './store/actions/authActions';
@@ -25,7 +25,10 @@ class Login extends React.Component {
   };
 
   render() {
-    const { authError } = this.props;
+    const { authError, isAuthenticated } = this.props;
+    if (isAuthenticated) {
+      return <Redirect to="/portal" />
+    }
     return (
       <Aux>
         {/*<div className="account-home-btn d-none d-sm-block">*/}
@@ -52,7 +55,7 @@ class Login extends React.Component {
                             </Link>
                           </h3>
                           <p className="text-muted">Sign in to continue to Tenant Portal.</p>
-                          { authError ? <p className="">{authError}</p>: null }
+                          { authError ? <p className="">Login Failed. Please Try Again</p>: null }
                         </div>
                         <div className="p-3">
                           <form onSubmit={this.handleSubmit}>
@@ -116,7 +119,8 @@ class Login extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    authError: state.auth.authError
+    authError: state.auth.errors,
+    isAuthenticated: state.auth.isAuthenticated
   }
 };
 

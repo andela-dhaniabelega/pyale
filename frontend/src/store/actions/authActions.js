@@ -1,21 +1,48 @@
 import axios from 'axios';
 
 const loginLink = 'http://127.0.0.1:8000/api/v1/user/login/';
+const loadUserLink = 'http://127.0.0.1:8000/api/v1/rest-auth/user/';
+const logOutLink = 'http://127.0.0.1:8000/api/v1/rest-auth/logout/';
+
+
+export const loadUser = () => {
+  return (dispatch, getState) => {
+    const token = getState().auth.token;
+
+    let headers = {};
+
+    if (token) {
+      headers["Authorization"] = `Token ${token}`;
+    }
+    return axios.get(loadUserLink, {headers: headers})
+      .then(res => {
+        dispatch({type: 'USER_LOADED', user: res.data});
+        return res.data;
+      }).catch((error) => {
+        dispatch({type: "AUTHENTICATION_ERROR", error});
+      });
+  }
+};
 
 export const login = (credentials) => {
   return (dispatch, getState) => {
-    axios.post(loginLink, {'email':credentials.email, 'password': credentials.password}).then((response) => {
-      console.log(response)
-    }).catch((error) => {
-      console.log(error)
-      dispatch({ type: 'LOGIN_ERROR', error })
-    })
-    // console.log("Entered Login Action", email, password);
-    // dispatch({type: 'LOGIN_SUCCESS'})
-    // APICALL().then(() => {
-    //   dispatch({type: 'LOGIN_SUCCESS', user})
-    // }).catch((error) => {
-    //   dispatch({ type: 'LOGIN_ERROR', error })
-    // })
+    let body = {'email': credentials.email, 'password': credentials.password};
+
+    return axios.post(loginLink, body)
+      .then(res => {
+        dispatch({type: 'LOGIN_SUCCESS', data: res.data});
+        return res.data;
+      }).catch((error)=>{
+        dispatch({type: "LOGIN_FAILED", error});
+      })
   }
 };
+
+export const logout = () => {
+  return (dispatch, getState) => {
+    return axios.post(logOutLink)
+      .then(() => {
+        dispatch({type: 'LOGOUT_SUCCESS'})
+      })
+  }
+}

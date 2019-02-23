@@ -1,20 +1,19 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import VisitorNavbar from './components/VisitorNavbar';
 import SocialMedia from './components/SocialMedia';
 import Footer from './components/Footer';
 import FooterLinks from './components/FooterLinks';
 import Aux from './hoc/Aux_'
+import Navbar from "./components/Navbar";
 
 
 class PropertyDetail extends React.Component {
     render() {
         return (
             <Aux>
-                <VisitorNavbar/>
-                <section className="section section-lg bg-web-desc">
+                <Navbar/>
+                 <section className="section section-lg bg-web-desc">
                     <div className="bg-overlay"></div>
-
                     <div className="bg-pattern-effect">
                         <img src="images/bg-pattern.png" alt=""/>
                     </div>

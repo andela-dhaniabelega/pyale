@@ -8,7 +8,6 @@ import Footer from './components/Footer';
 import FooterLinks from './components/FooterLinks';
 import Switcher from './components/Switcher';
 import Aux from './hoc/Aux_';
-import { connect } from 'react-redux';
 
 
 class HomeTwo extends React.Component {

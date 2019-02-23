@@ -1,5 +1,5 @@
 import React from 'react';
-import VisitorNavbar from './components/VisitorNavbar';
+import Navbar from './components/Navbar';
 import Services from './components/Services';
 import Features from './components/Features';
 import Descriptions from './components/Descriptions';
@@ -24,7 +24,7 @@ class HomeNine extends React.Component {
   	return (
         <Aux>
                 {/* Navbar Component*/}
-                <VisitorNavbar />
+                <Navbar />
                 <section className="section bg-home height-100vh" id="home">
                 <div className="bg-overlay"></div>
                     <div className="" >

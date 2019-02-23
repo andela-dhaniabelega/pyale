@@ -1,5 +1,5 @@
 import React from 'react';
-import VisitorNavbar from './components/VisitorNavbar';
+import Navbar from './components/Navbar';
 import Services from './components/Services';
 import Features from './components/Features';
 import Descriptions from './components/Descriptions';
@@ -23,7 +23,7 @@ class HomeOne extends React.Component {
   	return (
         <Aux>
                 {/* Navbar Component*/}
-                <VisitorNavbar />
+                <Navbar />
 
                 <section className="section bg-home home-half" id="home" data-image-src="images/bg-home.jpg">
                     <div className="bg-overlay"></div>

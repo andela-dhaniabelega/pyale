@@ -340,6 +340,18 @@ iframe {
   4.NAVBAR
   ======================*/
 
+.welcome-text {
+    /*position: absolute;*/
+    /*margin-top: 5rem;*/
+    /*color: #fff;*/
+    /*font-size: 1rem;*/
+    /*letter-spacing: 1px;*/
+    margin-top: 3px;
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    color: #fff;
+}
+
 .navbar-custom {
     padding: 20px 0px;
     width: 100%;
@@ -375,7 +387,6 @@ iframe {
     color: rgba(255, 255, 255, 0.6);
     font-size: 15px;
     background-color: transparent !important;
-    padding: 15px 0;
     margin: 0 10px;
     transition: all 0.4s;
 }
