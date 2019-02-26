@@ -1,7 +1,7 @@
 import React from 'react';
-import Aux from './hoc/Aux_';
+import Aux from '../hoc/Aux_';
 import { Link } from 'react-router-dom';
-import Switcher from './components/Switcher';
+import Switcher from '../components/Switcher';
 
 class PasswordForget extends React.Component {
   render() {

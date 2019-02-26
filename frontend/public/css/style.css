@@ -1,8 +1,5 @@
 /*
-* Template Name : Dorsin - Responsive Landing Template
-* Version : 1.0.0
-* Created by : Themesbrand
-* File: Main Css 
+* File: Main Css
 */
 
 
@@ -341,11 +338,6 @@ iframe {
   ======================*/
 
 .welcome-text {
-    /*position: absolute;*/
-    /*margin-top: 5rem;*/
-    /*color: #fff;*/
-    /*font-size: 1rem;*/
-    /*letter-spacing: 1px;*/
     margin-top: 3px;
     font-size: 1.3rem;
     letter-spacing: 1px;
@@ -1414,4 +1406,15 @@ ul.pattern .color8 {
 
 .property-slider .owl-next {
   right: 0px;
+}
+
+/* Tenant Document */
+.loading {
+    margin-top: 30%;
+    font-size: 1.3rem;
+    color: #7e7e7e;
+}
+
+.test {
+    margin-left: 530px;
 }

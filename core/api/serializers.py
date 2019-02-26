@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
-from core.models import Property, PropertyImage
+from core import models
 
 User = get_user_model()
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -29,7 +29,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "password")
+        fields = ("id", "first_name", "last_name", "email")
         extra_kwargs = {"password": {"write_only": True}}
 
 
@@ -74,7 +74,7 @@ class UserLoginSerializer(serializers.Serializer):
 
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PropertyImage
+        model = models.PropertyImage
         fields = "__all__"
 
 
@@ -82,5 +82,22 @@ class PropertySerializer(serializers.ModelSerializer):
     property_images = PropertyImageSerializer(read_only=True, many=True)
 
     class Meta:
-        model = Property
+        model = models.Property
         fields = ("id", "category", "total_cost", "description", "specs", "title", "is_active", "property_images")
+
+
+class TenantDocumentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.TenantDocument
+        fields = ("id", "document", "admin_only_access", "date_created", "date_modified", "name", "tenant")
+
+
+class UserDetailsSerializer(serializers.ModelSerializer):
+    """
+    Serializer to return existing user details.
+    """
+    class Meta:
+        model = User
+        fields = ("id", "first_name", "last_name", "email")
+        extra_kwargs = {"password": {"write_only": True}}

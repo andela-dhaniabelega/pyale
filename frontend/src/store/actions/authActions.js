@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const loginLink = 'http://127.0.0.1:8000/api/v1/user/login/';
+const loginLink = 'http://127.0.0.1:8000/api/v1/rest-auth/login/';
 const loadUserLink = 'http://127.0.0.1:8000/api/v1/rest-auth/user/';
 const logOutLink = 'http://127.0.0.1:8000/api/v1/rest-auth/logout/';
 
@@ -8,16 +8,13 @@ const logOutLink = 'http://127.0.0.1:8000/api/v1/rest-auth/logout/';
 export const loadUser = () => {
   return (dispatch, getState) => {
     const token = getState().auth.token;
-
     let headers = {};
-
     if (token) {
       headers["Authorization"] = `Token ${token}`;
     }
     return axios.get(loadUserLink, {headers: headers})
       .then(res => {
-        dispatch({type: 'USER_LOADED', user: res.data});
-        return res.data;
+        dispatch({type: 'USER_LOADED', data: res.data});
       }).catch((error) => {
         dispatch({type: "AUTHENTICATION_ERROR", error});
       });

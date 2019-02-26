@@ -1,10 +1,10 @@
 import React from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux'
 
-import { login } from './store/actions/authActions';
-import Aux from './hoc/Aux_';
-import Switcher from './components/Switcher';
+import { login } from '../store/actions/authActions';
+import Aux from '../hoc/Aux_';
+import Switcher from '../components/Switcher';
 
 
 class Login extends React.Component {
@@ -21,14 +21,13 @@ class Login extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.props.login(this.state)
+    this.props.login(this.state).then(() => {
+      this.props.history.push('/portal')
+    })
   };
 
   render() {
     const { authError, isAuthenticated } = this.props;
-    if (isAuthenticated) {
-      return <Redirect to="/portal" />
-    }
     return (
       <Aux>
         {/*<div className="account-home-btn d-none d-sm-block">*/}
@@ -130,4 +129,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login));

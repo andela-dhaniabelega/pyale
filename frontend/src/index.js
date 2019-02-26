@@ -9,34 +9,40 @@ import HomeSix from './HomeSix';
 import HomeSeven from './HomeSeven';
 import HomeEight from './HomeEight';
 import HomeNine from './HomeNine';
-import Login from './Login';
+import Login from './pages/Login';
 import SignUp from './SignUp';
-import PropertyDetail from './PropertyDetail';
-import PasswordForget from './PasswordForget';
-import Properties from './Properties';
-import TenantPortal from './TenantPortal'
+import PropertyDetail from './pages/PropertyDetail';
+import PasswordForget from './pages/PasswordForget';
+import Properties from './pages/Properties';
+import TenantPortal from './pages/TenantPortal'
 import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
 import {connect, Provider} from 'react-redux';
 import {loadUser} from './store/actions/authActions';
 import {persistor, store} from "./store/configureStore";
-import { PersistGate } from 'redux-persist/integration/react'
+import {PersistGate} from 'redux-persist/integration/react'
+import TenantDocument from "./pages/TenantDocument";
+
+
+// const PrivateRoute = ({ component: Component, ...rest }) => (
+//   <Route
+//     {...rest}
+//     render={props =>
+//       props.isAuthenticated ? (
+//         <Component {...props} />
+//       ) : (
+//         <Redirect
+//           to={{
+//             pathname: "/login",
+//             state: { from: props.location }
+//           }}
+//         />
+//       )
+//     }
+//   />
+// );
 
 class Root extends React.Component {
-  // componentDidMount() {
-  //   this.props.loadUser();
-  // }
-
-  // PrivateRoute = ({component: ChildComponent, ...rest}) => {
-  //   return <Route {...rest} render={props => {
-  //     if (!this.props.isAuthenticated) {
-  //       return <Redirect to="/login"/>;
-  //     } else {
-  //       return <ChildComponent {...props} />
-  //     }
-  //   }}/>
-  // };
-
   render() {
     return (
       <BrowserRouter basename={'/'}>
@@ -56,6 +62,7 @@ class Root extends React.Component {
           <Route exact path='/properties' component={Properties}/>
           <Route exact path='/portal' component={TenantPortal}/>
           <Route path='/password-forget' component={PasswordForget}/>
+          <Route path='/documents' component={TenantDocument}/>
           <Route path='/sign-up' component={SignUp}/>
         </Switch>
       </BrowserRouter>
@@ -63,7 +70,7 @@ class Root extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     isAuthenticated: state.auth.isAuthenticated,
   }

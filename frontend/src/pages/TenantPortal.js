@@ -1,22 +1,27 @@
 import React from 'react'
-import Aux from './hoc/Aux_';
-import Navbar from "./components/Navbar";
+import Aux from '../hoc/Aux_';
+import Navbar from "../components/Navbar";
 import {connect} from "react-redux";
+import {Link, Redirect} from "react-router-dom";
+import {loadUser} from "../store/actions/authActions";
 
 
 class TenantPortal extends React.Component {
   state = {
     user: {}
   };
-  componentDidMount() {
-    const { user } = this.props;
-    this.setState({
-      user
-    })
+
+  componentWillMount() {
+    if(!this.props.user) {
+      this.props.loadUser()
+    }
   }
 
   render() {
-    const { isAuthenticated, user } = this.props;
+    const {isAuthenticated, user} = this.props;
+     if (!isAuthenticated) {
+      return <Redirect to="/login" />
+    }
     return (
       <Aux>
         <Navbar/>
@@ -42,24 +47,27 @@ class TenantPortal extends React.Component {
             <div className="row margin-t-30">
               <div className="col-lg-4 margin-t-20">
                 <div className="services-box text-center hover-effect">
-                  <i className="pe-7s-diamond text-custom"></i>
-                  <h4 className="padding-t-15">Tenancy Documents</h4>
-                  <p className="padding-t-15 text-muted">Some quick example text to build on the card title and make up
-                    the bulk of the card's content. Moltin gives you the platform.</p>
+                  <i className="pe-7s-folder text-custom"></i>
+                  <h4 className="padding-t-15">
+                    <Link to="/documents">Tenancy Documents</Link>
+                  </h4>
+                  <p className="padding-t-15 text-muted">
+                    View all documents related to your tenancy including tenancy agreements etc.
+                  </p>
                 </div>
               </div>
               <div className="col-lg-4 margin-t-20">
                 <div className="services-box text-center hover-effect">
-                  <i className="pe-7s-display2 text-custom"></i>
-                  <h4 className="padding-t-15">Unlimited Colors</h4>
+                  <i className="pe-7s-home text-custom"></i>
+                  <h4 className="padding-t-15">My Letting</h4>
                   <p className="padding-t-15 text-muted">Credibly brand standards compliant users without extensible
                     services. Anibh euismod tincidunt ut laoreet.</p>
                 </div>
               </div>
               <div className="col-lg-4 margin-t-20">
                 <div className="services-box text-center hover-effect">
-                  <i className="pe-7s-piggy text-custom"></i>
-                  <h4 className="padding-t-15">Strategy Solutions</h4>
+                  <i className="pe-7s-edit text-custom"></i>
+                  <h4 className="padding-t-15">Change Email/Password</h4>
                   <p className="padding-t-15 text-muted">Separated they live in Bookmarksgrove right at the coast of the
                     Semantics, a large language ocean necessary regelialia.</p>
                 </div>
@@ -106,4 +114,10 @@ const mapStateToProps = (state) => {
   }
 };
 
-export default connect(mapStateToProps)(TenantPortal);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadUser: () => dispatch(loadUser())
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TenantPortal);

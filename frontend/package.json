@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "babel-loader": "^8.0.4",
+    "cloudinary-react": "^1.1.0",
     "react": "^16.7.0",
     "react-alice-carousel": "1.13.1",
     "react-build": "^1.0.8",

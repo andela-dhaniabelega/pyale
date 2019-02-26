@@ -1,9 +1,9 @@
 import React from 'react';
-import SocialMedia from './components/SocialMedia';
-import Footer from './components/Footer';
-import FooterLinks from './components/FooterLinks';
-import Aux from './hoc/Aux_'
-import Navbar from "./components/Navbar";
+import SocialMedia from '../components/SocialMedia';
+import Footer from '../components/Footer';
+import FooterLinks from '../components/FooterLinks';
+import Aux from '../hoc/Aux_'
+import Navbar from "../components/Navbar";
 
 
 class Properties extends React.Component {

@@ -1,10 +1,10 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import SocialMedia from './components/SocialMedia';
-import Footer from './components/Footer';
-import FooterLinks from './components/FooterLinks';
-import Aux from './hoc/Aux_'
-import Navbar from "./components/Navbar";
+import SocialMedia from '../components/SocialMedia';
+import Footer from '../components/Footer';
+import FooterLinks from '../components/FooterLinks';
+import Aux from '../hoc/Aux_'
+import Navbar from "../components/Navbar";
 
 
 class PropertyDetail extends React.Component {

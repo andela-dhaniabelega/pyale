@@ -12,7 +12,7 @@ class Navbar extends React.Component {
 
   render() {
     const {isAuthenticated} = this.props;
-    return (
+    return [
       <nav className="navbar navbar-expand-lg fixed-top navbar-custom sticky sticky-dark">
         <div className="container">
           <a className="navbar-brand logo text-uppercase" href="/">
@@ -70,7 +70,7 @@ class Navbar extends React.Component {
           </div>
         </div>
       </nav>
-    );
+    ];
   }
 }
 

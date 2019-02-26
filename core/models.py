@@ -4,7 +4,6 @@ import re
 import cloudinary
 import cloudinary.uploader
 from dirtyfields import DirtyFieldsMixin
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
@@ -98,6 +97,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Property(models.Model):
     PROPERTY_CATEGORIES = (("Residential", "residential"), ("Commercial", "commercial"))
+    PROPERTY_LOCATIONS = (("Lagos", "lagos"), ("Port Harcourt", "portharcourt"))
 
     category = models.CharField(max_length=255, choices=PROPERTY_CATEGORIES)
     property_value = MoneyField(
@@ -136,6 +136,7 @@ class Property(models.Model):
     description = models.TextField()
     specs = ArrayField(models.CharField(max_length=512))
     name = models.CharField(unique=True, max_length=512)
+    location = models.CharField(blank=True, null=True, max_length=100, choices=PROPERTY_LOCATIONS)
 
     def __str__(self):
         return self.name

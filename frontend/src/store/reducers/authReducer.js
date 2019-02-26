@@ -9,12 +9,18 @@ const initState = {
 const authReducer = (state = initState, action) => {
   switch (action.type) {
     case 'LOGIN_SUCCESS':
-      localStorage.setItem("token", action.data.token);
+      localStorage.setItem("token", action.data.key);
       return {
         ...state,
         user: action.data.user,
         isAuthenticated: true,
-        errors: null
+        errors: null,
+        token: action.data.key
+      };
+    case 'USER_LOADED':
+      return {
+        ...state,
+        user: action.data
       };
     case 'LOGIN_FAILED':
       return {
