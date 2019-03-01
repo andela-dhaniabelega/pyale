@@ -83,7 +83,8 @@ class PropertySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Property
-        fields = ("id", "category", "total_cost", "description", "specs", "title", "is_active", "property_images")
+        fields = ("id", "category", "current_rental_value", "description", "specs", "name",
+                  "location", "property_images")
 
 
 class TenantDocumentSerializer(serializers.ModelSerializer):

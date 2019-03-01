@@ -50,30 +50,23 @@ from core.utils import IsSuperUser
 #             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PropertyList(generics.ListCreateAPIView):
+class PropertyList(generics.ListAPIView):
     """
     Create New Property or List Existing Properties
     """
 
     queryset = models.Property.objects.all()
     serializer_class = serializers.PropertySerializer
-    permission_classes = (permissions.IsAuthenticated, IsSuperUser)
+    permission_classes = ()
 
 
-class PropertyDetails(generics.RetrieveUpdateDestroyAPIView):
+class PropertyDetails(generics.RetrieveAPIView):
     """
     Retrieve, Update or Destroy a given property
     """
 
     queryset = models.Property.objects.all()
     serializer_class = serializers.PropertySerializer
-    permission_classes = (permissions.IsAuthenticated, IsSuperUser)
-
-    def destroy(self, request, *args, **kwargs):
-        obj = models.Property.objects.get(pk=kwargs["pk"])
-        obj.is_active = False
-        obj.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TenantDocumentList(generics.ListAPIView):

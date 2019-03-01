@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from cloudinary.models import CloudinaryField
@@ -182,7 +182,8 @@ class PropertyRunningCosts(models.Model):
 class PropertyImage(DirtyFieldsMixin, models.Model):
     realty = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_images")
     image = CloudinaryField("image")
-    tag = models.CharField(max_length=255, unique=True, help_text="A unique name for this image")
+    image_details = JSONField(max_length=255, null=True, blank=True)
+    tag = models.CharField(max_length=255, help_text="A tag name for this image")
 
     def __str__(self):
         return self.tag
@@ -191,7 +192,8 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
         self.full_clean()
         if self._state.adding:
             new_image = cloudinary.uploader.upload(self.image, use_filename=True, folder="property_images/")
-            self.image = new_image["url"]
+            self.image_details = new_image
+            self.image = new_image['url']
         else:
             modified_fields = self.get_dirty_fields()
             if "image" in modified_fields:
@@ -201,14 +203,16 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
 
                 # Save new Image
                 new_image = cloudinary.uploader.upload(self.image)
-                self.image = new_image["url"]
+                self.image_details = new_image
+                self.image = new_image['url']
         super().save()
 
     def clean(self):
-        if self.image.content_type not in ALLOWED_IMAGE_TYPES:
-            raise ValidationError({"image": "Unsupported Image Format. Supported: .jpg, .jpeg, .png, .gif, .svg"})
-        if self.image.size > 1_000_000:
-            raise ValidationError({"image": "Maximum Image size is 10MB"})
+        if hasattr(self.image, 'file'):
+            if self.image.content_type not in ALLOWED_IMAGE_TYPES:
+                raise ValidationError({"image": "Unsupported Image Format. Supported: .jpg, .jpeg, .png, .gif, .svg"})
+            if self.image.size > 1_000_000:
+                raise ValidationError({"image": "Maximum Image size is 10MB"})
 
     def delete(self, using=None, keep_parents=False):
         public_id = get_public_id_from_url(self.image.url)
