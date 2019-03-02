@@ -37,3 +37,26 @@ export const logout = () => {
       })
   }
 };
+
+export const createPasswordResetToken = (email) => {
+  return (dispatch, getState) => {
+    return axios.post(`${constants.LOCAL_HOST}/api/v1/password_reset/`, {'email': email})
+      .then((res) => {
+        dispatch({type: 'PASSWORD_RESET_TOKEN_SUCCESS'})
+      }).catch((error) => {
+        console.log(error)
+      })
+  }
+};
+
+export const resetPassword = (credentials) => {
+  return (dispatch, getState) => {
+    return axios.post(`${constants.LOCAL_HOST}/api/v1/password_reset/confirm/`,
+      {'password': credentials.password, 'token': credentials.token})
+      .then((res) => {
+        dispatch({type: "PASSWORD_RESET_SUCCESS"})
+      }).catch((error) => {
+        dispatch({type: "PASSWORD_RESET_ERROR"})
+      })
+  }
+};

@@ -7,6 +7,7 @@ urlpatterns = [
     # path("user/login/", views.UserLogin.as_view()),
     path("properties/", views.PropertyList.as_view()),
     path("properties/<int:pk>/", views.PropertyDetails.as_view()),
-    path('tenant/documents/', views.TenantDocumentList.as_view()),
-    path('rest-auth/', include('rest_auth.urls'))
+    path("tenant/documents/", views.TenantDocumentList.as_view()),
+    path("rest-auth/", include("rest_auth.urls")),
+    path("password_reset/", include("django_rest_passwordreset.urls", namespace="password_reset")),
 ]

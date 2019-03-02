@@ -1,0 +1,3 @@
+LOCAL_HOST = "http://127.0.0.1:3000/"
+STAGING_HOST = ""
+PRODUCTION_HOST = ""

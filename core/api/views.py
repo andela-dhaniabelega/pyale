@@ -93,7 +93,6 @@ class TenantDocumentList(generics.ListAPIView):
         return Response(serializer.data)
 
 
-
 # class PropertyImageList(generics.ListCreateAPIView):
 #     """
 #     Add or List Property Images

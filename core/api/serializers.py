@@ -83,12 +83,19 @@ class PropertySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Property
-        fields = ("id", "category", "current_rental_value", "description", "specs", "name",
-                  "location", "property_images")
+        fields = (
+            "id",
+            "category",
+            "current_rental_value",
+            "description",
+            "specs",
+            "name",
+            "location",
+            "property_images",
+        )
 
 
 class TenantDocumentSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.TenantDocument
         fields = ("id", "document", "admin_only_access", "date_created", "date_modified", "name", "tenant")
@@ -98,7 +105,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     """
     Serializer to return existing user details.
     """
+
     class Meta:
         model = User
-        fields = ("id", "first_name", "last_name", "email")
-        extra_kwargs = {"password": {"write_only": True}}
+        fields = ("id", "first_name", "last_name", "email", "password")

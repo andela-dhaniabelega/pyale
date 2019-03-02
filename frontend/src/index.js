@@ -22,6 +22,7 @@ import {loadUser} from './store/actions/authActions';
 import {persistor, store} from "./store/configureStore";
 import {PersistGate} from 'redux-persist/integration/react'
 import TenantDocument from "./pages/TenantDocument";
+import PasswordReset from "./pages/PasswordReset";
 
 
 // const PrivateRoute = ({ component: Component, ...rest }) => (
@@ -61,7 +62,8 @@ class Root extends React.Component {
           <Route exact path='/detail' component={PropertyDetail}/>
           <Route exact path='/properties' component={Properties}/>
           <Route exact path='/portal' component={TenantPortal}/>
-          <Route path='/password-forget' component={PasswordForget}/>
+          <Route path='/forgot_password' component={PasswordForget}/>
+          <Route path='/password_reset' component={PasswordReset}/>
           <Route path='/documents' component={TenantDocument}/>
           <Route path='/sign-up' component={SignUp}/>
         </Switch>

@@ -6,16 +6,20 @@ import cloudinary.uploader
 from dirtyfields import DirtyFieldsMixin
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from cloudinary.models import CloudinaryField
 import pendulum
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.html import strip_tags
+from django_rest_passwordreset.signals import reset_password_token_created
 from djmoney.models.fields import MoneyField
 
+from core.constants import LOCAL_HOST
 from core.utils import get_public_id_from_url, get_cycles_from_date_range, generate_random_string
 from pyale import settings
 from pyale.settings import EMAIL_HOST_USER
@@ -193,7 +197,7 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
         if self._state.adding:
             new_image = cloudinary.uploader.upload(self.image, use_filename=True, folder="property_images/")
             self.image_details = new_image
-            self.image = new_image['url']
+            self.image = new_image["url"]
         else:
             modified_fields = self.get_dirty_fields()
             if "image" in modified_fields:
@@ -204,11 +208,11 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
                 # Save new Image
                 new_image = cloudinary.uploader.upload(self.image)
                 self.image_details = new_image
-                self.image = new_image['url']
+                self.image = new_image["url"]
         super().save()
 
     def clean(self):
-        if hasattr(self.image, 'file'):
+        if hasattr(self.image, "file"):
             if self.image.content_type not in ALLOWED_IMAGE_TYPES:
                 raise ValidationError({"image": "Unsupported Image Format. Supported: .jpg, .jpeg, .png, .gif, .svg"})
             if self.image.size > 1_000_000:
@@ -414,11 +418,7 @@ class Letting(DirtyFieldsMixin, models.Model):
 
             # Create new schedule
             self.create_payment_schedule(
-                self.schedule_type,
-                self.cost.amount,
-                self.start_date,
-                self.end_date.add(days=1).date(),
-                self.type
+                self.schedule_type, self.cost.amount, self.start_date, self.end_date.add(days=1).date(), self.type
             )
         super().save()
 
@@ -468,17 +468,13 @@ class Letting(DirtyFieldsMixin, models.Model):
             "annual": self.create_annual_schedule,
             "quarterly": self.create_quarterly_schedule,
             "monthly": self.create_monthly_schedule,
-            "single": self.create_single_schedule
+            "single": self.create_single_schedule,
         }
         payment_schedules[schedule_type.lower()](cost, start_date, end_date, letting_type)
 
     def create_single_schedule(self, cost, letting_type):
         PaymentSchedule.objects.create(
-            letting_id=self.id,
-            amount_due=cost,
-            payment_status=False,
-            payment_cycle="Single Payment",
-            tag=letting_type
+            letting_id=self.id, amount_due=cost, payment_status=False, payment_cycle="Single Payment", tag=letting_type
         )
 
     def create_annual_schedule(self, cost, start_date, end_date, letting_type):
@@ -490,8 +486,9 @@ class Letting(DirtyFieldsMixin, models.Model):
                 amount_due=amount_per_year,
                 payment_status=False,
                 payment_cycle=year,
-                tag=letting_type
-            ) for year in years
+                tag=letting_type,
+            )
+            for year in years
         ]
         PaymentSchedule.objects.bulk_create(new_payment_schedule)
 
@@ -504,8 +501,9 @@ class Letting(DirtyFieldsMixin, models.Model):
                 amount_due=amount_per_quarter,
                 payment_status=False,
                 payment_cycle=quarter,
-                tag=letting_type
-            ) for quarter in quarters
+                tag=letting_type,
+            )
+            for quarter in quarters
         ]
         PaymentSchedule.objects.bulk_create(new_payment_schedule)
 
@@ -518,8 +516,9 @@ class Letting(DirtyFieldsMixin, models.Model):
                 amount_due=amount_per_month,
                 payment_status=False,
                 payment_cycle=month,
-                tag=letting_type
-            ) for month in months
+                tag=letting_type,
+            )
+            for month in months
         ]
         PaymentSchedule.objects.bulk_create(new_payment_schedule)
 
@@ -598,6 +597,9 @@ class PropertyRecords(models.Model):
     )
 
 
+# Signals
+
+
 @receiver(post_save, sender=PaymentSchedule)
 def update_letting(sender, **kwargs):
     instance = kwargs.get("instance")
@@ -655,3 +657,40 @@ def send_registration_email(sender, **kwargs):
             recipient_list=[instance.email],
             html_message=message,
         )
+
+
+@receiver(reset_password_token_created)
+def password_reset_token_created(sender, reset_password_token, *args, **kwargs):
+    """
+    Handles password reset tokens
+    When a token is created, an e-mail needs to be sent to the user
+    :param sender:
+    :param reset_password_token:
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    # send an e-mail to the user
+    context = {
+        "host": LOCAL_HOST,
+        "current_user": reset_password_token.user,
+        "email": reset_password_token.user.email,
+        "reset_password_url": "{}?token={}".format("password_reset", reset_password_token.key),
+    }
+
+    # render email text
+    email_html_message = render_to_string("email/user_reset_password.html", context)
+    email_plaintext_message = render_to_string("email/user_reset_password.txt", context)
+
+    msg = EmailMultiAlternatives(
+        # title:
+        "Pyale Properties Tenant Portal Password Reset",
+        # message:
+        email_plaintext_message,
+        # from:
+        EMAIL_HOST_USER,
+        # to:
+        [reset_password_token.user.email],
+    )
+    msg.attach_alternative(email_html_message, "text/html")
+    msg.send()

@@ -32,12 +32,15 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000',
     '127.0.0.1:3000'
     'http://localhost:3000/',
+    'http://127.0.0.1:3000/',
+    'http://127.0.0.1:3000',
+
 )
 
 INSTALLED_APPS = [
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'rest_auth',
     'cloudinary',
     'corsheaders',
+    'django_rest_passwordreset',
     'core',
     'djmoney'
 ]
@@ -180,7 +184,7 @@ SUIT_CONFIG = {
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'core.api.serializers.UserRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'core.api.serializers.UserDetailsSerializer',
 }
 
 # EMAIL SETTINGS
