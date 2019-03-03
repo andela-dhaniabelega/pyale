@@ -60,3 +60,34 @@ export const resetPassword = (credentials) => {
       })
   }
 };
+
+export const changePassword = (credentials) => {
+  return (dispatch, getState) => {
+    const headers = setAuthHeader(getState);
+    const body = {
+      'new_password1': credentials.newPassword,
+      'new_password2': credentials.newPasswordRepeat,
+      'old_password': credentials.currentPassword
+    };
+    return axios.post(`${constants.LOCAL_HOST}/api/v1/rest-auth/password/change/`, body, {headers})
+      .then((res) => {
+        dispatch({type: "PASSWORD_CHANGE_SUCCESS"})
+      }).catch((error) => {
+        dispatch({type: "PASSWORD_CHANGE_ERROR"})
+      })
+  }
+};
+
+export const changeEmail = (email, id) => {
+  return (dispatch, getState) => {
+    const headers = setAuthHeader(getState);
+    const body = {'email': email};
+    return axios.patch(`${constants.LOCAL_HOST}/api/v1/tenant/${id}/email/change/`, body, {headers})
+      .then((res) => {
+        dispatch({type: "EMAIL_CHANGE_SUCCESS"})
+      }).catch((error) => {
+        dispatch({type: "EMAIL_CHANGE_ERROR"})
+      })
+  }
+};
+

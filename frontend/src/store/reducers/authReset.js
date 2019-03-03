@@ -1,6 +1,10 @@
 const initState = {
   passwordResetComplete: false,
-  passwordResetIncomplete: null
+  passwordResetIncomplete: null,
+  passwordChangeComplete: false,
+  passwordChangeIncomplete: false,
+  emailChangeComplete: false,
+  emailChangeInComplete: false
 };
 
 const authReset = (state = initState, action) => {
@@ -14,6 +18,28 @@ const authReset = (state = initState, action) => {
       return {
         ...state,
         passwordResetIncomplete: true
+      };
+    case 'PASSWORD_CHANGE_SUCCESS':
+      return {
+        ...state,
+        passwordChangeComplete: true,
+        passwordChangeIncomplete: false
+      };
+    case 'PASSWORD_CHANGE_ERROR':
+      return {
+        ...state,
+        passwordChangeIncomplete: true
+      };
+    case 'EMAIL_CHANGE_SUCCESS':
+      return {
+        ...state,
+        emailChangeComplete: true,
+        emailChangeInComplete: false,
+      };
+    case 'EMAIL_CHANGE_ERROR':
+      return {
+        ...state,
+        emailChangeInComplete: true
       };
     default:
       return state

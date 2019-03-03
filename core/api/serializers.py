@@ -109,3 +109,12 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "first_name", "last_name", "email", "password")
+
+
+class EmailChangeSerializer(serializers.ModelSerializer):
+    """
+    Serializer to change user email.
+    """
+    class Meta:
+        model = User
+        fields = ("email", )

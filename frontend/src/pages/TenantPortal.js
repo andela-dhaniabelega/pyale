@@ -2,7 +2,7 @@ import React from 'react'
 import Aux from '../hoc/Aux_';
 import Navbar from "../components/Navbar";
 import {connect} from "react-redux";
-import {Link, Redirect} from "react-router-dom";
+import {Link, Redirect, withRouter} from "react-router-dom";
 import {loadUser} from "../store/actions/authActions";
 
 
@@ -120,4 +120,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(TenantPortal);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(TenantPortal));

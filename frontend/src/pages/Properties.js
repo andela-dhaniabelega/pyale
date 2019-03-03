@@ -6,6 +6,7 @@ import Aux from '../hoc/Aux_'
 import Navbar from "../components/Navbar";
 import {connect} from "react-redux";
 import {loadProperties} from "../store/actions/properties";
+import {  withRouter } from 'react-router-dom';
 
 
 class Properties extends React.Component {
@@ -16,7 +17,6 @@ class Properties extends React.Component {
 
   render() {
     const { allProperties } = this.props;
-    console.log(allProperties)
     return (
       <Aux>
         <Navbar/>
@@ -40,11 +40,11 @@ class Properties extends React.Component {
               {
                 allProperties && allProperties.map((property) => {
                   return (
-                    <div className="col-lg-3">
+                    <div className="col-lg-3" key={property.id}>
                       <div className="blog-box margin-t-30 hover-effect">
                         {property.property_images.map((imageItem) => {
                            if (imageItem.tag === "thumbnail"){
-                             return <img src={imageItem.image_details&&imageItem.image_details.url} className="img-fluid" alt=""/>
+                             return <img src={imageItem.image_details&&imageItem.image_details.url} className="img-fluid" alt="" key={imageItem.id}/>
                            }
                         })}
                         <div>
@@ -104,4 +104,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Properties);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Properties));

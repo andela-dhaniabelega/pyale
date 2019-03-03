@@ -93,6 +93,16 @@ class TenantDocumentList(generics.ListAPIView):
         return Response(serializer.data)
 
 
+class EmailChange(generics.UpdateAPIView):
+    serializer_class = serializers.EmailChangeSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('pk')
+        queryset = models.User.objects.filter(id=user_id)
+        return queryset
+
+
 # class PropertyImageList(generics.ListCreateAPIView):
 #     """
 #     Add or List Property Images
