@@ -8,7 +8,6 @@ import Footer from './components/Footer';
 import FooterLinks from './components/FooterLinks';
 import Switcher from './components/Switcher';
 import Aux from './hoc/Aux_';
-import {logout} from "./store/actions/authActions";
 import {connect} from "react-redux";
 import Navbar from "./components/Navbar";
 
@@ -89,12 +88,5 @@ const mapStateToProps = (state) => {
     isAuthenticated: state.auth.isAuthenticated
   }
 };
-
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     logout: () => dispatch(logout())
-//   }
-// };
-
 
 export default connect(mapStateToProps)(HomeTwo);

@@ -5,7 +5,8 @@ import {Link} from "react-router-dom";
 class HomeNavBar extends React.Component {
   render() {
     return (
-      <nav className="navbar navbar-expand-lg fixed-top navbar-custom sticky sticky-dark">
+      <div>
+        <nav className="navbar navbar-expand-lg fixed-top navbar-custom sticky sticky-dark">
         <div className="container">
           <a className="navbar-brand logo text-uppercase" href="/">
             Pyale Properties
@@ -46,6 +47,7 @@ class HomeNavBar extends React.Component {
           </div>
         </div>
       </nav>
+      </div>
     );
   }
 }

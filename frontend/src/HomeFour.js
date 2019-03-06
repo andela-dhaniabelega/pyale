@@ -14,90 +14,55 @@ import SocialMedia from './components/SocialMedia';
 import Footer from './components/Footer';
 import FooterLinks from './components/FooterLinks';
 import Switcher from './components/Switcher';
-import { Link } from 'react-router-dom';
 import Aux from './hoc/Aux_';
+import HomeNavBar from "./HomeTwo";
+import {connect} from "react-redux";
+import Sale from "./components/Sale";
+import Rent from "./components/Rent";
 
 class HomeFour extends React.Component {
   render() {
 
- 
-  	return (
-        <Aux>
-                {/* Navbar Component*/}
-                <Navbar />
+    const { isAuthenticated } = this.props;
+    return (
+      <Aux>
+        {/* Navbar Component*/}
+        {isAuthenticated ? <Navbar/> : <HomeNavBar/>}
 
-                <section className="section bg-home home-half" id="home">
-                    <div className="bg-overlay"></div>
-                    <div className="display-table">
-                        <div className="display-table-cell">
-                            <div className="container">
-                                <div className="row vertical-content">
-                                    <div className="col-lg-7 text-white text-left margin-t-30">
-                                        <h1 className="home-title">We help startups launch their products</h1>
-                                        <p className="padding-t-15 home-desc home-subtitle-width-100">Etiam sed.Interdum consequat proin vestibulum className at a euismod mus luctus quam.Lorem ipsum dolor sit amet, consectetur adipisicing eli.</p>
-                                        <Link to="JavaScript:Void(0);" className="btn btn-custom margin-t-30 waves-effect waves-light">Get Started <i className="mdi mdi-arrow-right"></i></Link>
-                                    </div>
-                                    <div className="col-lg-4 offset-lg-1 margin-t-30">
-                                        <div className="home-registration-form bg-white">
-                                            <h4 className="form-heading text-center mt-2">Get 30 day FREE Trial</h4>
-                                            <form className="registration-form" id="registration-form">
-                                                <input type="text" id="exampleInputName1" className="form-control registration-input-box" placeholder="Name" />
-                                                <input type="email" id="exampleInputEmail1" className="form-control registration-input-box" placeholder="Email" />
-                                                <textarea className="form-control registration-textarea-box" rows="4" placeholder="Message"></textarea>
-                                                <button className="btn btn-custom home-btn-width waves-effect waves-light">Send Detail</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Services Component*/}
-                <Services />
-
-                {/* Features Component*/}
-                <Features />
-                
-                {/* Descriptions Component*/}
-                <Descriptions />
-
-                {/* Pricing Component*/}
-                <Pricing />
-
-                {/* Team Component*/}
-                <Team />
-
-                {/* Process Component*/}
-                <Process />
-
-                {/* Testi Component*/}
-                <Testi />
-
-                {/* Started Component*/}
-                <Started />
-
-                {/* Blog Component*/}
-                <Blog />
-
-                {/* Contact Component*/}
-                <Contact />
-
-                {/* SocialMedia Component*/}
-                <SocialMedia />
-                
-                {/* Footer Component*/}
-                <Footer />
-
-                {/* FooterLinks Component*/}
-                <FooterLinks />
-
-                {/* Switcher Component*/}
-               <Switcher /> 
-        </Aux>
-  	);
+        <section className="section bg-home home-half" id="home">
+          <div className="bg-overlay"></div>
+          <div className="display-table">
+            <div className="display-table-cell">
+              <div className="container">
+                <div className="row vertical-content">
+                  <div className="col-lg-8 text-white text-left margin-t-5">
+                    <h2 className="home-title">We Build. We Lease. We Rent. </h2>
+                    <p className="padding-t-15 home-desc">
+                      Pyale Properties leases and rents commercial and residential properties at
+                      affordable rates across multiple locations in Nigeria including Lagos &
+                      PortHarcourt
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <Sale/>
+        <Rent/>
+        <SocialMedia/>
+        <Footer/>
+        <FooterLinks/>
+      </Aux>
+    );
   }
 }
 
-export default HomeFour;
+const mapStateToProps = (state) => {
+  return {
+    isAuthenticated: state.auth.isAuthenticated
+  }
+};
+
+
+export default connect(mapStateToProps)(HomeFour);

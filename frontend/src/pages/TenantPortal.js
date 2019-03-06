@@ -4,6 +4,9 @@ import Navbar from "../components/Navbar";
 import {connect} from "react-redux";
 import {Link, Redirect, withRouter} from "react-router-dom";
 import {loadUser} from "../store/actions/authActions";
+import Footer from "../components/Footer";
+import SocialMedia from "../components/SocialMedia";
+import FooterLinks from "../components/FooterLinks";
 
 
 class TenantPortal extends React.Component {
@@ -27,9 +30,6 @@ class TenantPortal extends React.Component {
         <Navbar/>
         <section className="section section-lg bg-web-desc">
           <div className="bg-overlay"></div>
-          <div className="bg-pattern-effect">
-            <img src="images/bg-pattern.png" alt=""/>
-          </div>
         </section>
         <section className="section pt-5" id="services">
           <div className="container">
@@ -48,7 +48,7 @@ class TenantPortal extends React.Component {
               <div className="col-lg-4 margin-t-20">
                 <div className="services-box text-center hover-effect">
                   <i className="pe-7s-folder text-custom"></i>
-                  <h4 className="padding-t-15">
+                  <h4 className="padding-t-15 portal-heading">
                     <Link to="/documents">Tenancy Documents</Link>
                   </h4>
                   <p className="padding-t-15 text-muted">
@@ -59,49 +59,31 @@ class TenantPortal extends React.Component {
               <div className="col-lg-4 margin-t-20">
                 <div className="services-box text-center hover-effect">
                   <i className="pe-7s-home text-custom"></i>
-                  <h4 className="padding-t-15">My Letting</h4>
-                  <p className="padding-t-15 text-muted">Credibly brand standards compliant users without extensible
-                    services. Anibh euismod tincidunt ut laoreet.</p>
+                  <h4 className="padding-t-15 portal-heading">
+                    <Link to="/documents">My Letting</Link>
+                  </h4>
+                  <p className="padding-t-15 text-muted">
+                    Access all relevant information related to your letting
+                  </p>
                 </div>
               </div>
               <div className="col-lg-4 margin-t-20">
                 <div className="services-box text-center hover-effect">
                   <i className="pe-7s-edit text-custom"></i>
-                  <h4 className="padding-t-15">Change Email/Password</h4>
-                  <p className="padding-t-15 text-muted">Separated they live in Bookmarksgrove right at the coast of the
-                    Semantics, a large language ocean necessary regelialia.</p>
-                </div>
-              </div>
-            </div>
-            <div className="row margin-t-30">
-              <div className="col-lg-4 margin-t-20">
-                <div className="services-box text-center hover-effect">
-                  <i className="pe-7s-science text-custom"></i>
-                  <h4 className="padding-t-15">Awesome Support</h4>
-                  <p className="padding-t-15 text-muted">It is a paradisematic country, in which roasted parts of
-                    sentences fly into your mouth leave for the far World.</p>
-                </div>
-              </div>
-              <div className="col-lg-4 margin-t-20">
-                <div className="services-box text-center hover-effect">
-                  <i className="pe-7s-news-paper text-custom"></i>
-                  <h4 className="padding-t-15">Truly Multipurpose</h4>
-                  <p className="padding-t-15 text-muted">Even the all-powerful Pointing has no control about the blind
-                    texts it is an almost unorthographic.</p>
-                </div>
-              </div>
-              <div className="col-lg-4 margin-t-20">
-                <div className="services-box text-center hover-effect">
-                  <i className="pe-7s-plane text-custom"></i>
-                  <h4 className="padding-t-15">Easy to customize</h4>
-                  <p className="padding-t-15 text-muted">Question Marks and devious Semikoli, but the Little Blind Text
-                    didn’t listen. She packed her seven versalia.</p>
+                  <h4 className="padding-t-15 portal-heading">
+                    <Link to="/settings">Edit Profile</Link>
+                  </h4>
+                  <p className="padding-t-15 text-muted">
+                    Change your Email or Password
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
+        <SocialMedia/>
+        <Footer/>
+        <FooterLinks/>
       </Aux>
     );
   }

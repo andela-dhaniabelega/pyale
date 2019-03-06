@@ -14,6 +14,7 @@ import {PersistGate} from 'redux-persist/integration/react'
 import TenantDocument from "./pages/TenantDocument";
 import PasswordReset from "./pages/PasswordReset";
 import Settings from "./pages/Settings";
+import HomeFour from "./HomeFour";
 
 
 class Root extends React.Component {
@@ -22,6 +23,7 @@ class Root extends React.Component {
       <BrowserRouter basename={'/'}>
         <Switch>
           <Route exact path='/' component={HomeTwo}/>
+          <Route exact path='/home' component={HomeFour}/>
           <Route exact path='/login' component={Login}/>
           <Route exact path='/detail' component={PropertyDetail}/>
           <Route exact path='/properties' component={Properties}/>

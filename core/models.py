@@ -100,8 +100,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Property(models.Model):
-    PROPERTY_CATEGORIES = (("Residential", "residential"), ("Commercial", "commercial"))
-    PROPERTY_LOCATIONS = (("Lagos", "lagos"), ("Port Harcourt", "portharcourt"))
+    PROPERTY_CATEGORIES = (("residential", "Residential"), ("commercial", "Commercial"), ("retail", "Retail"))
+    PROPERTY_LOCATIONS = (("lagos", "Lagos"), ("portharcourt", "Port Harcourt"))
 
     category = models.CharField(max_length=255, choices=PROPERTY_CATEGORIES)
     property_value = MoneyField(

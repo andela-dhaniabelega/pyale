@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link, withRouter} from "react-router-dom";
+import {Link, NavLink, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {logout} from "../store/actions/authActions";
 
@@ -13,7 +13,8 @@ class Navbar extends React.Component {
   render() {
     const {isAuthenticated} = this.props;
     return (
-      <nav className="navbar navbar-expand-lg fixed-top navbar-custom sticky sticky-dark">
+      <div>
+        <nav className="navbar navbar-expand-lg fixed-top navbar-custom sticky sticky-dark">
         <div className="container">
           <a className="navbar-brand logo text-uppercase" href="/">
             Pyale Properties
@@ -32,7 +33,7 @@ class Navbar extends React.Component {
           <div className="collapse navbar-collapse" id="navbarCollapse">
             <ul className="navbar-nav navbar-center" id="mySidenav">
               <li className="nav-item active">
-                <Link to="/" className="nav-link">Home</Link>
+                <NavLink to="/" className="nav-link">Home</NavLink>
               </li>
               <li className="nav-item">
                 <Link to="/properties" className="nav-link">All Properties</Link>
@@ -71,6 +72,7 @@ class Navbar extends React.Component {
           </div>
         </div>
       </nav>
+      </div>
     );
   }
 }
