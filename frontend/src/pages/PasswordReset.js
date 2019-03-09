@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 
 import { resetPassword } from '../store/actions/authActions';
 import Aux from '../hoc/Aux_';
-import Switcher from '../components/Switcher';
 import {FormErrors} from "../components/FormErrors";
 
 
@@ -177,9 +176,6 @@ class PasswordReset extends React.Component {
             </div>
           </div>
         </section>
-
-        <Switcher/>
-
       </Aux>
     );
   }

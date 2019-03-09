@@ -44,7 +44,7 @@ export const createPasswordResetToken = (email) => {
       .then((res) => {
         dispatch({type: 'PASSWORD_RESET_TOKEN_SUCCESS'})
       }).catch((error) => {
-        console.log(error)
+        dispatch({type: 'PASSWORD_RESET_TOKEN_ERROR'})
       })
   }
 };

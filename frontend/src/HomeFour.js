@@ -4,7 +4,7 @@ import SocialMedia from './components/SocialMedia';
 import Footer from './components/Footer';
 import FooterLinks from './components/FooterLinks';
 import Aux from './hoc/Aux_';
-import HomeNavBar from "./HomeTwo";
+import HomeNavBar from "./components/HomeNavBar";
 import {connect} from "react-redux";
 import Commercial from "./components/Commercial";
 import Residential from "./components/Residential";

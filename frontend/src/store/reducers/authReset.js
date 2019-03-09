@@ -4,7 +4,10 @@ const initState = {
   passwordChangeComplete: false,
   passwordChangeIncomplete: false,
   emailChangeComplete: false,
-  emailChangeInComplete: false
+  emailChangeInComplete: false,
+  passwordResetLinkSent: false,
+  passwordResetLinkNotSent: false,
+  passwordResetError: ''
 };
 
 const authReset = (state = initState, action) => {
@@ -40,6 +43,18 @@ const authReset = (state = initState, action) => {
       return {
         ...state,
         emailChangeInComplete: true
+      };
+    case 'PASSWORD_RESET_TOKEN_SUCCESS':
+      return {
+        ...state,
+        passwordResetLinkSent: true
+      };
+    case 'PASSWORD_RESET_TOKEN_ERROR':
+      return {
+        ...state,
+        passwordResetLinkSent: false,
+        passwordResetError: "Unable to Reset Password. Please ensure you're using your registered email address." +
+          "  Contact support (support@pyaleproperties.com) if this persists."
       };
     default:
       return state

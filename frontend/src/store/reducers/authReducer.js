@@ -4,8 +4,6 @@ const initState = {
   isAuthenticated: null,
   token: localStorage.getItem("token"),
   user: {},
-  passwordResetLinkSent: false,
-  passwordResetComplete: false
 };
 
 const authReducer = (state = initState, action) => {
@@ -16,7 +14,7 @@ const authReducer = (state = initState, action) => {
         ...state,
         user: action.data.user,
         isAuthenticated: true,
-        errors: null,
+        authError: false,
         token: action.data.key
       };
     case 'USER_LOADED':
@@ -39,16 +37,6 @@ const authReducer = (state = initState, action) => {
         token: null,
         user: null,
         isAuthenticated: false
-      };
-    case 'PASSWORD_RESET_TOKEN_SUCCESS':
-      return {
-        ...state,
-        passwordResetLinkSent: true
-      };
-    case 'PASSWORD_RESET_SUCCESS':
-      return {
-        ...state,
-        passwordResetComplete: true
       };
     default:
       return state

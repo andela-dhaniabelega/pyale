@@ -1,28 +1,61 @@
 import React from 'react';
 import Aux from '../hoc/Aux_';
-import {Link} from 'react-router-dom';
-import Switcher from '../components/Switcher';
+import {Link, withRouter} from 'react-router-dom';
 import {connect} from "react-redux";
 import {createPasswordResetToken} from "../store/actions/authActions";
+import {FormErrors} from "../components/FormErrors";
 
 class PasswordForget extends React.Component {
   state = {
     email: "",
-    passwordResetLinkSent: false
+    passwordResetLinkSent: false,
+    isSendingEmail: false,
+    formErrors: {email: '', passwordResetError: ''},
+    emailValid: false,
   };
 
   handleChange = (e) => {
+    const id = e.target.id;
+    const value = e.target.value;
     this.setState({
-      [e.target.id]: e.target.value
+      [id]: value
+    }, () => {
+      this.validateEmail(id, value)
     })
+  };
+
+  validateEmail = (id, email) => {
+    let fieldValidationErrors = this.state.formErrors;
+    let emailValid = this.state.emailValid;
+    let re = /\S+@\S+\.\S+/;
+
+    emailValid = re.test(email);
+    fieldValidationErrors.email = emailValid ? '' : 'Invalid Email';
+
+    this.setState({
+      formErrors: fieldValidationErrors,
+      emailValid: emailValid,
+    }, this.validateForm);
+  };
+
+  validateForm = () => {
+    this.setState({
+      formValid: this.state.emailValid
+    });
   };
 
   handlePasswordReset = (e) => {
     e.preventDefault();
+    this.setState({isSendingEmail: true});
     this.props.createPasswordResetToken(this.state.email).then(() => {
-      this.setState({
-        passwordResetLinkSent: true
-      })
+      this.setState(prevState => ({
+        passwordResetLinkSent: this.props.passwordResetLinkSent,
+        isSendingEmail: false,
+        formErrors: {
+          ...prevState.formErrors,
+          passwordResetError: this.props.passwordResetError
+        }
+      }));
     })
   };
 
@@ -32,10 +65,12 @@ class PasswordForget extends React.Component {
   };
 
   render() {
-    const { passwordResetLinkSent } = this.state;
+    if (this.props.isAuthenticated) {
+      this.props.history.push('/')
+    }
+    const {passwordResetLinkSent} = this.state;
     return (
       <Aux>
-
         <div className="account-home-btn d-none d-sm-block">
           <Link to="/" className="text-white forgot-password-logo">PYALE PROPERTIES</Link>
         </div>
@@ -59,7 +94,7 @@ class PasswordForget extends React.Component {
                                   >Tenant Portal</Link>
                                 </h3>
                                 <p className="text-muted">Reset Password</p>
-                                {this.props.passwordResetIncomplete ? <div className="red"> Link Expired. Please enter your email if you wish to reset your password</div> : ""}
+                                <FormErrors formErrors={this.state.formErrors} />
                               </div>
                               <div className="p-3">
                                 <div className="alert alert-warning  text-center" role="alert">
@@ -84,7 +119,7 @@ class PasswordForget extends React.Component {
                                       className="btn btn-custom btn-block"
                                       onClick={this.handlePasswordReset}
                                     >
-                                      Reset your Password
+                                      {this.state.isSendingEmail ? 'Loading...' : 'Reset Your Password'}
                                     </button>
                                   </div>
                                 </form>
@@ -98,13 +133,13 @@ class PasswordForget extends React.Component {
                                 </div>
                               </div>
                               <div className="mt-3">
-                                  <button
-                                    type="submit"
-                                    className="btn btn-custom btn-block"
-                                    onClick={this.loginAfterPasswordReset}
-                                  >
-                                    Login
-                                  </button>
+                                <button
+                                  type="submit"
+                                  className="btn btn-custom btn-block"
+                                  onClick={this.loginAfterPasswordReset}
+                                >
+                                  Login
+                                </button>
                               </div>
                             </div>
                           )
@@ -117,9 +152,6 @@ class PasswordForget extends React.Component {
             </div>
           </div>
         </section>
-
-        <Switcher/>
-
       </Aux>
     );
   }
@@ -127,8 +159,9 @@ class PasswordForget extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    passwordResetLinkSent: state.auth.passwordResetLinkSent,
-    passwordResetIncomplete: state.authReset.passwordResetIncomplete
+    passwordResetLinkSent: state.authReset.passwordResetLinkSent,
+    passwordResetError: state.authReset.passwordResetError,
+    isAuthenticated: state.auth.isAuthenticated
   }
 };
 
@@ -138,4 +171,4 @@ const mapDispatchToProps = (dispatch) => {
   }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PasswordForget);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PasswordForget));

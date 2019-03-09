@@ -1,16 +1,17 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import { connect } from 'react-redux'
+import {Link, withRouter} from 'react-router-dom';
+import {connect} from 'react-redux'
 
-import { login } from '../store/actions/authActions';
+import {login} from '../store/actions/authActions';
 import Aux from '../hoc/Aux_';
-import Switcher from '../components/Switcher';
+import {FormErrors} from "../components/FormErrors";
 
 
 class Login extends React.Component {
   state = {
     email: "",
-    password: ""
+    password: "",
+    formErrors: {authError: ''},
   };
 
   handleChange = (e) => {
@@ -22,12 +23,25 @@ class Login extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.login(this.state).then(() => {
-      this.props.history.push('/portal')
+      if (this.props.authError) {
+        this.setState(prevState => ({
+          formErrors: {
+            ...prevState.formErrors,
+            authError: 'Invalid Login Credentials. Please try again.'
+          }
+        }))
+      } else {
+        // if (this.props.isInitialLogin) {
+        //   this.props.resetPassword()
+        // } else {
+        //   this.props.history.push('/portal')
+        // }
+        this.props.history.push('/portal')
+      }
     })
   };
 
   render() {
-    const { authError, isAuthenticated } = this.props;
     return (
       <Aux>
         {/*<div className="account-home-btn d-none d-sm-block">*/}
@@ -54,7 +68,7 @@ class Login extends React.Component {
                             </Link>
                           </h3>
                           <p className="text-muted">Sign in to continue to Tenant Portal.</p>
-                          { authError ? <p className="">Login Failed. Please Try Again</p>: null }
+                          <FormErrors formErrors={this.state.formErrors}/>
                         </div>
                         <div className="p-3">
                           <form onSubmit={this.handleSubmit}>
@@ -108,9 +122,6 @@ class Login extends React.Component {
             </div>
           </div>
         </section>
-
-        <Switcher/>
-
       </Aux>
     );
   }
@@ -118,7 +129,7 @@ class Login extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    authError: state.auth.errors,
+    authError: state.auth.authError,
     isAuthenticated: state.auth.isAuthenticated
   }
 };
