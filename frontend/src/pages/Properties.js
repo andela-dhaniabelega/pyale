@@ -224,13 +224,8 @@ class Properties extends React.Component {
             </div>
           </div>
         </section>
-        {/* SocialMedia Component*/}
         <SocialMedia/>
-
-        {/* Footer Component*/}
         <Footer/>
-
-        {/* FooterLinks Component*/}
         <FooterLinks/>
       </Aux>
     );

@@ -15,6 +15,8 @@ import TenantDocument from "./pages/TenantDocument";
 import PasswordReset from "./pages/PasswordReset";
 import Settings from "./pages/Settings";
 import HomeFour from "./HomeFour";
+import Contact from "./components/Contact";
+import TenantContact from "./pages/TenantContact";
 
 
 class Root extends React.Component {
@@ -22,8 +24,7 @@ class Root extends React.Component {
     return (
       <BrowserRouter basename={'/'}>
         <Switch>
-          <Route exact path='/' component={HomeTwo}/>
-          <Route exact path='/home' component={HomeFour}/>
+          <Route exact path='/' component={HomeFour}/>
           <Route exact path='/login' component={Login}/>
           <Route exact path='/detail' component={PropertyDetail}/>
           <Route exact path='/properties' component={Properties}/>
@@ -32,6 +33,8 @@ class Root extends React.Component {
           <Route exact path='/password_reset' component={PasswordReset}/>
           <Route exact path='/documents' component={TenantDocument}/>
           <Route exact path='/settings' component={Settings}/>
+          <Route exact path='/contact' component={Contact}/>
+          <Route exact path='/support' component={TenantContact}/>
         </Switch>
       </BrowserRouter>
     );

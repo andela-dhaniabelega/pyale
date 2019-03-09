@@ -1523,3 +1523,7 @@ ul.pattern .color8 {
 .property-title h5:hover {
     color: #fb3e3e !important;
 }
+
+.m-t--250 {
+    margin-top: -250px;
+}

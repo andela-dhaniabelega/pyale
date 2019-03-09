@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 
 import { login } from '../store/actions/authActions';
 import Aux from '../hoc/Aux_';
-import Switcher from '../components/Switcher';
 
 
 class Login extends React.Component {
@@ -108,9 +107,6 @@ class Login extends React.Component {
             </div>
           </div>
         </section>
-
-        <Switcher/>
-
       </Aux>
     );
   }

@@ -8,7 +8,7 @@ export const getTenantDocuments = () => {
     const headers = setAuthHeader(getState);
     return axios.get(`${constants.LOCAL_HOST}/api/v1/tenant/documents/`, {headers})
       .then((res) => {
-        dispatch( {type: 'TENANT_DOCUMENTS_SUCCESS', data: res.data} )
+        dispatch({type: 'TENANT_DOCUMENTS_SUCCESS', data: res.data})
       }).catch((error) => {
         console.log(error)
       })
