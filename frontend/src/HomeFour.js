@@ -1,29 +1,49 @@
 import React from 'react';
 import Navbar from './components/Navbar';
-import Services from './components/Services';
-import Features from './components/Features';
-import Descriptions from './components/Descriptions';
-import Pricing from './components/Pricing';
-import Team from './components/Team';
-import Process from './components/Process';
-import Testi from './components/Testi';
-import Started from './components/Started';
-import Blog from './components/Blog';
-import Contact from './components/Contact';
 import SocialMedia from './components/SocialMedia';
 import Footer from './components/Footer';
 import FooterLinks from './components/FooterLinks';
-import Switcher from './components/Switcher';
 import Aux from './hoc/Aux_';
 import HomeNavBar from "./HomeTwo";
 import {connect} from "react-redux";
-import Sale from "./components/Sale";
-import Rent from "./components/Rent";
+import Commercial from "./components/Commercial";
+import Residential from "./components/Residential";
+import {loadProperties} from "./store/actions/properties";
+import Retail from "./components/Retail";
 
 class HomeFour extends React.Component {
-  render() {
+  state = {
+    retail: [],
+    commercial: [],
+    residential: []
+  };
 
-    const { isAuthenticated } = this.props;
+
+  componentWillMount() {
+    this.props.loadProperties().then(() => {
+      const {allProperties} = this.props;
+      if (allProperties) {
+        const retail = allProperties.filter((property) => {
+          return property.category === 'retail'
+        });
+        const commercial = allProperties.filter((property) => {
+          return property.category === 'commercial'
+        });
+        const residential = allProperties.filter((property) => {
+          return property.category === 'residential'
+        });
+
+        this.setState({
+          retail: retail.length <= 3 ? retail : retail.slice(0, 3),
+          commercial: commercial.length <= 3 ? commercial : commercial.slice(0, 3),
+          residential: residential.length <= 3 ? residential : residential.slice(0, 3)
+        })
+      }
+    });
+  }
+
+  render() {
+    const {isAuthenticated} = this.props;
     return (
       <Aux>
         {/* Navbar Component*/}
@@ -48,8 +68,9 @@ class HomeFour extends React.Component {
             </div>
           </div>
         </section>
-        <Sale/>
-        <Rent/>
+        <Commercial properties={this.state.commercial}/>
+        <Residential properties={this.state.residential}/>
+        <Retail properties={this.state.retail}/>
         <SocialMedia/>
         <Footer/>
         <FooterLinks/>
@@ -60,9 +81,15 @@ class HomeFour extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    isAuthenticated: state.auth.isAuthenticated
+    isAuthenticated: state.auth.isAuthenticated,
+    allProperties: state.properties.allProperties
   }
 };
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadProperties: () => dispatch(loadProperties())
+  }
+};
 
-export default connect(mapStateToProps)(HomeFour);
+export default connect(mapStateToProps, mapDispatchToProps)(HomeFour);

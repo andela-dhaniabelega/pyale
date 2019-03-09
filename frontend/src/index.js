@@ -22,8 +22,7 @@ class Root extends React.Component {
     return (
       <BrowserRouter basename={'/'}>
         <Switch>
-          <Route exact path='/' component={HomeTwo}/>
-          <Route exact path='/home' component={HomeFour}/>
+          <Route exact path='/' component={HomeFour}/>
           <Route exact path='/login' component={Login}/>
           <Route exact path='/detail' component={PropertyDetail}/>
           <Route exact path='/properties' component={Properties}/>
