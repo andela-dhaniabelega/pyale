@@ -703,7 +703,7 @@ iframe {
      6. SERVICES
 ========================================*/
 
-.services-box {
+.services-box .document-box{
     padding: 15px 10px;
 }
 
@@ -717,6 +717,16 @@ iframe {
     line-height: 68px;
     margin-bottom: 15px;
 }
+
+.documents-box i {
+    font-size: 64px;
+    height: 68px;
+    width: 68px;
+    background-color: #fff;
+    line-height: 68px;
+    margin-bottom: 15px;
+}
+
 
 .services-box:hover i {
     background-color: #fb3e3e !important;
@@ -811,6 +821,10 @@ iframe {
 
 .team-box {
     border-bottom: 1px solid #ecf0f5;
+}
+
+.ics {
+    width: 100%;
 }
 
 .team-name {
