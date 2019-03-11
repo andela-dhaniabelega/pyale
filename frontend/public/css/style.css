@@ -1112,6 +1112,7 @@ textarea.form-control {
 
 .account-pages-logo {
     letter-spacing: 2px;
+    font-family: 'Bauhaus', sans-serif;
 }
 
 .account-card form .form-control {
@@ -1421,7 +1422,7 @@ ul.pattern .color8 {
 .forgot-password-logo {
     font-weight: 700;
     letter-spacing: 2px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Bauhaus', sans-serif;
     font-size: 20px;
 }
 

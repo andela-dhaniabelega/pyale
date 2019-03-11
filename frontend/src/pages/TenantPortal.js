@@ -16,14 +16,18 @@ class TenantPortal extends React.Component {
 
   componentWillMount() {
     if(!this.props.user) {
-      this.props.loadUser()
+      this.props.loadUser().then(() => {
+        if (this.props.user && !this.props.user.is_previously_logged_in) {
+          this.props.history.push('/password_change')
+        }
+      })
     }
   }
 
   render() {
     const {isAuthenticated, user} = this.props;
-     if (!isAuthenticated) {
-      return <Redirect to="/login" />
+    if (!isAuthenticated) {
+      return <Redirect to="/login"/>
     }
     return (
       <Aux>

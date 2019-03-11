@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import HomeTwo from './HomeTwo';
 import Login from './pages/Login';
 import PropertyDetail from './pages/PropertyDetail';
 import PasswordForget from './pages/PasswordForget';
@@ -13,6 +12,7 @@ import {persistor, store} from "./store/configureStore";
 import {PersistGate} from 'redux-persist/integration/react'
 import TenantDocument from "./pages/TenantDocument";
 import PasswordReset from "./pages/PasswordReset";
+import PasswordChange from "./pages/PasswordChange";
 import Settings from "./pages/Settings";
 import HomeFour from "./HomeFour";
 
@@ -29,6 +29,7 @@ class Root extends React.Component {
           <Route exact path='/portal' component={TenantPortal}/>
           <Route exact path='/forgot_password' component={PasswordForget}/>
           <Route exact path='/password_reset' component={PasswordReset}/>
+          <Route exact path='/password_change' component={PasswordChange}/>
           <Route exact path='/documents' component={TenantDocument}/>
           <Route exact path='/settings' component={Settings}/>
         </Switch>

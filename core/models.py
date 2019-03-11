@@ -62,6 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_modified = models.DateTimeField(auto_now=True)
     temp_password_expiry = models.DateTimeField(null=True, blank=True)
     temp_password = models.CharField(max_length=50, null=True, blank=True)
+    is_previously_logged_in = models.BooleanField(default=False, blank=True)
 
     objects = UserManager()
 
@@ -646,7 +647,7 @@ def send_registration_email(sender, **kwargs):
         regarding your tenancy</li><li>And much more</li></ul>. <br/>To access this portal, 
         Visit <a href="">http://pyaleproperties.com/login</a> and login with the your email and temporary 
         password shown below. You'll prompted to change this password when you login. <br/>
-        <br/> Email: {instance.email}<br/> Password: {instance._temp_password}. <br/>Do not hesitate to contact us
+        <br/> Email: {instance.email}<br/> Password: {instance.temp_password} <br/>Do not hesitate to contact us
         at support@pyaleproperties.com, if you have any issues."""
         plain_message = strip_tags(message)
 

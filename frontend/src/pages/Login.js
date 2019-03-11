@@ -31,11 +31,6 @@ class Login extends React.Component {
           }
         }))
       } else {
-        // if (this.props.isInitialLogin) {
-        //   this.props.resetPassword()
-        // } else {
-        //   this.props.history.push('/portal')
-        // }
         this.props.history.push('/portal')
       }
     })
@@ -130,7 +125,8 @@ class Login extends React.Component {
 const mapStateToProps = (state) => {
   return {
     authError: state.auth.authError,
-    isAuthenticated: state.auth.isAuthenticated
+    isAuthenticated: state.auth.isAuthenticated,
+    user: state.auth.user
   }
 };
 

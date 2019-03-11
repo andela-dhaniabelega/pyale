@@ -186,6 +186,7 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 OLD_PASSWORD_FIELD_ENABLED = True
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'core.api.serializers.UserDetailsSerializer',
+    'LOGIN_SERIALIZER': 'core.api.serializers.LoginSerializer'
 }
 
 # EMAIL SETTINGS

@@ -7,7 +7,9 @@ const initState = {
   emailChangeInComplete: false,
   passwordResetLinkSent: false,
   passwordResetLinkNotSent: false,
-  passwordResetError: ''
+  passwordResetError: '',
+  initialPasswordChangeComplete: false,
+  initialPasswordChangeError: ''
 };
 
 const authReset = (state = initState, action) => {
@@ -27,6 +29,17 @@ const authReset = (state = initState, action) => {
         ...state,
         passwordChangeComplete: true,
         passwordChangeIncomplete: false
+      };
+    case 'INITIAL_PASSWORD_CHANGE_SUCCESS':
+      return {
+        ...state,
+        initialPasswordChangeComplete: true,
+      };
+    case 'INITIAL_PASSWORD_CHANGE_ERROR':
+      return {
+        ...state,
+        initialPasswordChangeComplete: false,
+        initialPasswordChangeError: "Something went wrong. Please ensure you've entered your current password correctly."
       };
     case 'PASSWORD_CHANGE_ERROR':
       return {

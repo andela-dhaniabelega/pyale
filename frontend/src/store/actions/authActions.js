@@ -78,6 +78,23 @@ export const changePassword = (credentials) => {
   }
 };
 
+export const initialChangePassword = (credentials) => {
+  return (dispatch, getState) => {
+    const headers = setAuthHeader(getState);
+    const body = {
+      'new_password1': credentials.newPassword,
+      'new_password2': credentials.newPasswordRepeat,
+      'old_password': credentials.currentPassword
+    };
+    return axios.post(`${constants.LOCAL_HOST}/api/v1/rest-auth/password/change/`, body, {headers})
+      .then((res) => {
+        dispatch({type: "INITIAL_PASSWORD_CHANGE_SUCCESS"})
+      }).catch((error) => {
+        dispatch({type: "INITIAL_PASSWORD_CHANGE_ERROR"})
+      })
+  }
+};
+
 export const changeEmail = (email, id) => {
   return (dispatch, getState) => {
     const headers = setAuthHeader(getState);

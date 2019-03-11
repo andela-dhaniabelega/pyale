@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, get_user_model
-from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
+
+from rest_framework import serializers, exceptions
 from rest_framework_jwt.settings import api_settings
 
 from core import models
@@ -72,6 +74,56 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(msg)
 
 
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    password = serializers.CharField(style={'input_type': 'password'})
+    is_previously_logged_in = serializers.BooleanField(default=False)
+
+    def _validate_username_email(self, username, email, password):
+        user = None
+
+        if email and password:
+            user = authenticate(email=email, password=password)
+        elif username and password:
+            user = authenticate(username=username, password=password)
+        else:
+            msg = _('Must include either "username" or "email" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        if user.last_login is not None:
+            user.is_previously_logged_in = True
+        return user
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        user = None
+
+        if email:
+            try:
+                username = User.objects.get(email__iexact=email).get_username()
+            except User.DoesNotExist:
+                pass
+
+        if username:
+            user = self._validate_username_email(username, '', password)
+
+        # Did we get back an active user?
+        if user:
+            if not user.is_active:
+                msg = _('User account is disabled.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Unable to log in with provided credentials.')
+            raise exceptions.ValidationError(msg)
+
+        attrs['user'] = user
+        return attrs
+
+
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PropertyImage
@@ -108,7 +160,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "first_name", "last_name", "email", "password")
+        fields = ("id", "first_name", "last_name", "email", "password", "is_previously_logged_in")
 
 
 class EmailChangeSerializer(serializers.ModelSerializer):
