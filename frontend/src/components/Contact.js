@@ -20,18 +20,16 @@ class Contact extends React.Component {
             <div className="col-lg-8 offset-lg-2">
               <h1 className="section-title text-center">Get In Touch</h1>
               <div className="section-title-border margin-t-20"></div>
-              <p className="section-subtitle text-muted text-center font-secondary padding-t-30">We thrive when coming
-                up with innovative ideas but also understand that a smart concept should be supported with measurable
-                results.</p>
+              {/*<p className="section-subtitle text-muted text-center font-secondary padding-t-30">We thrive when coming*/}
+                {/*up with innovative ideas but also understand that a smart concept should be supported with measurable*/}
+                {/*results.</p>*/}
             </div>
           </div>
           <div className="row">
             <div className="col-lg-4">
               <div className="mt-4 pt-4">
-                <p className="mt-4"><span className="h5">Office Address 1:</span><br/> <span
-                  className="text-muted d-block mt-2">4461 Cedar Street Moro, AR 72368</span></p>
-                <p className="mt-4"><span className="h5">Office Address 2:</span><br/> <span
-                  className="text-muted d-block mt-2">2467 Swick Hill Street <br/>New Orleans, LA 70171</span></p>
+                <p className="mt-4"><span className="h5">Phone Numbers:</span><br/> <span
+                  className="text-muted d-block mt-2">+234 (0)84 423 163<br/> +234 (0)803 300 8341</span></p>
                 <p className="mt-4"><span className="h5">Working Hours:</span><br/> <span
                   className="text-muted d-block mt-2">9:00AM To 6:00PM</span></p>
               </div>

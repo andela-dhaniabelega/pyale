@@ -82,8 +82,6 @@ class Login extends React.Component {
                             <div className="custom-control custom-checkbox">
                               <input type="checkbox" className="custom-control-input"
                                      id="customControlInline"/>
-                              <label className="custom-control-label"
-                                     htmlFor="customControlInline">Remember me</label>
                             </div>
 
                             <div className="mt-3">
