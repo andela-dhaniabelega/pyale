@@ -93,6 +93,17 @@ class TenantPortal extends React.Component {
                   </p>
                 </div>
               </div>
+              <div className="col-lg-4 margin-t-20">
+                <div className="services-box text-center hover-effect">
+                  <i className="pe-7s-comment text-custom"></i>
+                  <h4 className="padding-t-15 portal-heading">
+                    <Link to="/support">Contact Support</Link>
+                  </h4>
+                  <p className="padding-t-15 text-muted">
+                    Having any Issues? Please Let us know.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

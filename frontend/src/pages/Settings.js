@@ -69,9 +69,6 @@ class TenantDocument extends React.Component {
         <Navbar/>
         <section className="section section-lg bg-web-desc">
           <div className="bg-overlay"></div>
-          <div className="bg-pattern-effect">
-            <img src="images/bg-pattern.png" alt=""/>
-          </div>
         </section>
         <section className="section pt-4" id="team">
           <div className="container">

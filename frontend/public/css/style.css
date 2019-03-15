@@ -181,7 +181,7 @@ b {
 
 
 .section-lg {
-    padding: 100px 0;
+    padding: 70px 0;
 }
 
 .section-title {
@@ -1542,6 +1542,10 @@ ul.pattern .color8 {
 
 .property-title h5:hover {
     color: #fb3e3e !important;
+}
+
+.m-t--250 {
+    margin-top: -250px;
 }
 
 .view-details h5 {

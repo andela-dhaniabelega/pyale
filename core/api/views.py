@@ -1,7 +1,8 @@
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, permissions
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
 from core.api import serializers
 from core import models
 from core.utils import IsSuperUser
@@ -79,15 +80,38 @@ class PropertyFilter(generics.ListAPIView):
     permission_classes = ()
 
     def get_queryset(self):
-        categories = self.request.query_params.get("categories", None).split(",")
-        location = self.request.query_params.get("location", None)
+        categories = self.request.query_params.get('categories', None).split(',')
+        location = self.request.query_params.get('location', None)
 
-        if categories and "" not in categories:
-            if location and location != "all":
+        if categories and '' not in categories:
+            if location and location != 'all':
                 return models.Property.objects.filter(category__in=categories, location__exact=location)
             else:
                 return models.Property.objects.filter(category__in=categories)
-        elif location and location != "all":
-            return models.Property.objects.filter(location=location)
+        elif location and location != 'all':
+                return models.Property.objects.filter(location=location)
 
         return models.Property.objects.all()
+
+class TenantSupport(APIView):
+
+    def post(self, request, format=None):
+        from_email = request.data.get('email')
+        message = request.data.get('message')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        subject = request.data.get('subject')
+
+        msg = EmailMultiAlternatives(
+            subject=f"Support Request from {first_name} {last_name}: " + subject,
+            body=message,
+            from_email=from_email,
+            to=['support@pyaleproperties.com'],
+            reply_to=[from_email],
+        )
+        try:
+            msg.send()
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=e)
+        else:
+            return Response(data="Success", status=status.HTTP_200_OK)
