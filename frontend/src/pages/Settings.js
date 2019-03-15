@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import Aux from '../hoc/Aux_';
 import Navbar from '../components/Navbar';
 import {Redirect} from "react-router-dom";
-import {changeEmail, changePassword} from "../store/actions/authActions";
+import {changeEmail, changePassword} from "../redux/actions/authActions";
 
 
 class TenantDocument extends React.Component {

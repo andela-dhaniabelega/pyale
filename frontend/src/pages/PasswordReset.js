@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux'
 
-import { resetPassword } from '../store/actions/authActions';
+import { resetPassword } from '../redux/actions/authActions';
 import Aux from '../hoc/Aux_';
 import {FormErrors} from "../components/FormErrors";
 

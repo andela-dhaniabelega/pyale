@@ -77,7 +77,7 @@ class UserLoginSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_blank=True)
-    password = serializers.CharField(style={'input_type': 'password'})
+    password = serializers.CharField(style={"input_type": "password"})
     is_previously_logged_in = serializers.BooleanField(default=False)
 
     def _validate_username_email(self, username, email, password):
@@ -96,9 +96,9 @@ class LoginSerializer(serializers.Serializer):
         return user
 
     def validate(self, attrs):
-        username = attrs.get('username')
-        email = attrs.get('email')
-        password = attrs.get('password')
+        username = attrs.get("username")
+        email = attrs.get("email")
+        password = attrs.get("password")
 
         user = None
 
@@ -109,18 +109,18 @@ class LoginSerializer(serializers.Serializer):
                 pass
 
         if username:
-            user = self._validate_username_email(username, '', password)
+            user = self._validate_username_email(username, "", password)
 
         # Did we get back an active user?
         if user:
             if not user.is_active:
-                msg = _('User account is disabled.')
+                msg = _("User account is disabled.")
                 raise exceptions.ValidationError(msg)
         else:
-            msg = _('Unable to log in with provided credentials.')
+            msg = _("Unable to log in with provided credentials.")
             raise exceptions.ValidationError(msg)
 
-        attrs['user'] = user
+        attrs["user"] = user
         return attrs
 
 
@@ -153,6 +153,27 @@ class TenantDocumentSerializer(serializers.ModelSerializer):
         fields = ("id", "document", "admin_only_access", "date_created", "date_modified", "name", "tenant")
 
 
+class PaymentScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PaymentSchedule
+        fields = "__all__"
+
+
+class LettingSerializer(serializers.ModelSerializer):
+    payment_schedules = PaymentScheduleSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = models.Letting
+        fields = "__all__"
+
+
+class BillsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Bills
+        fields = "__all__"
+
+
 class UserDetailsSerializer(serializers.ModelSerializer):
     """
     Serializer to return existing user details.
@@ -167,6 +188,7 @@ class EmailChangeSerializer(serializers.ModelSerializer):
     """
     Serializer to change user email.
     """
+
     class Meta:
         model = User
-        fields = ("email", )
+        fields = ("email",)

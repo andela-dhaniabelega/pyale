@@ -2,8 +2,10 @@ import React from 'react'
 import {connect} from "react-redux";
 import Aux from '../hoc/Aux_';
 import Navbar from '../components/Navbar';
-import {getTenantDocuments} from "../store/actions/tenant";
-import {Link, Redirect} from "react-router-dom";
+import {getTenantDocuments} from "../redux/actions/tenant";
+import {Redirect} from "react-router-dom";
+import {DocumentItem} from "../components/DocumentItem";
+import {Alert} from "../components/Alert";
 
 
 class TenantDocument extends React.Component {
@@ -31,6 +33,18 @@ class TenantDocument extends React.Component {
     if (!isAuthenticated) {
       return <Redirect to="/login"/>
     }
+    let tenantDocuments;
+
+    if (this.state.isLoading) {
+      tenantDocuments = <Alert message="Loading Documents..."/>
+    } else {
+      if (this.state.documents.length === 0) {
+        tenantDocuments = <Alert message="No Documents added"/>
+      } else {
+        tenantDocuments = <DocumentItem document={this.state.documents}/>
+      }
+    }
+
     return (
       <Aux>
         <Navbar/>
@@ -52,22 +66,9 @@ class TenantDocument extends React.Component {
                 </p>
               </div>
             </div>
-            <div className="row margin-t-50">
-                {
-                  this.state.documents && this.state.documents.map((item) => {
-                    return (
-                      <div className="col-lg-3 margin-t-20">
-                        <div className="documents-box text-center hover-effect">
-                          <i className="pe-7s-folder text-custom"></i>
-                          <h4 className="padding-t-15 portal-heading">
-                            <a href={item.document}>{item.name}</a>
-                          </h4>
-                        </div>
-                      </div>
-                    )
-                  })
-                }
-              </div>
+              {
+                tenantDocuments
+              }
           </div>
         </section>
       </Aux>

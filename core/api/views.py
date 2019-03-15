@@ -21,11 +21,12 @@ class PropertyDetails(generics.RetrieveAPIView):
     """
     Retrieve, Update or Destroy a given property
     """
+
     serializer_class = serializers.PropertySerializer
     permission_classes = ()
 
     def get_object(self):
-        pk = self.kwargs.get('pk')
+        pk = self.kwargs.get("pk")
         return models.Property.objects.get(pk=pk)
 
 
@@ -53,12 +54,22 @@ class TenantDocumentList(generics.ListAPIView):
         return Response(serializer.data)
 
 
+class TenantBillsList(generics.ListAPIView):
+    model = models.Letting
+    serializer_class = serializers.BillsSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        pk = self.request.user.id
+        return models.Bills.objects.filter(tenant__id=pk)
+
+
 class EmailChange(generics.UpdateAPIView):
     serializer_class = serializers.EmailChangeSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        user_id = self.kwargs.get('pk')
+        user_id = self.kwargs.get("pk")
         queryset = models.User.objects.filter(id=user_id)
         return queryset
 
@@ -68,15 +79,15 @@ class PropertyFilter(generics.ListAPIView):
     permission_classes = ()
 
     def get_queryset(self):
-        categories = self.request.query_params.get('categories', None).split(',')
-        location = self.request.query_params.get('location', None)
+        categories = self.request.query_params.get("categories", None).split(",")
+        location = self.request.query_params.get("location", None)
 
-        if categories and '' not in categories:
-            if location and location != 'all':
+        if categories and "" not in categories:
+            if location and location != "all":
                 return models.Property.objects.filter(category__in=categories, location__exact=location)
             else:
                 return models.Property.objects.filter(category__in=categories)
-        elif location and location != 'all':
-                return models.Property.objects.filter(location=location)
+        elif location and location != "all":
+            return models.Property.objects.filter(location=location)
 
         return models.Property.objects.all()

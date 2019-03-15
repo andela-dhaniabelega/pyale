@@ -8,7 +8,7 @@ import HomeNavBar from "./components/HomeNavBar";
 import {connect} from "react-redux";
 import Commercial from "./components/Commercial";
 import Residential from "./components/Residential";
-import {loadProperties} from "./store/actions/properties";
+import {loadProperties} from "./redux/actions/properties";
 import Retail from "./components/Retail";
 
 class HomeFour extends React.Component {

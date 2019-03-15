@@ -1547,3 +1547,8 @@ ul.pattern .color8 {
 .view-details h5 {
     cursor: pointer !important;
 }
+
+caption {
+    caption-side: top;
+    font-size: 1.3rem;
+}

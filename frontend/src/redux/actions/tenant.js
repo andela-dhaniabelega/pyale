@@ -1,0 +1,30 @@
+import axios from 'axios';
+import constants from '../../appConstants'
+import {setAuthHeader} from '../../actionHelpers'
+
+
+export const getTenantDocuments = () => {
+  return (dispatch, getState) => {
+    const headers = setAuthHeader(getState);
+    return axios.get(`${constants.LOCAL_HOST}/api/v1/tenant/documents/`, {headers})
+      .then((res) => {
+        dispatch({type: 'TENANT_DOCUMENTS_LOAD_SUCCESS', data: res.data})
+      }).catch((error) => {
+        console.log(error)
+      })
+  }
+};
+
+export const getTenantBills = () => {
+  return (dispatch, getState) => {
+    const headers = setAuthHeader(getState);
+    const id = getState().auth.user.id;
+    return axios.get(`${constants.LOCAL_HOST}/api/v1/tenant/${id}/bills/`, {headers})
+      .then((res) => {
+        dispatch({type: 'TENANT_BILLS_LOAD_SUCCESS', data: res.data})
+      }).catch((error) => {
+        console.log(error)
+      })
+  }
+};
+

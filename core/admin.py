@@ -132,6 +132,26 @@ class LettingAdmin(admin.ModelAdmin):
     letting_duration.short_description = "Duration"
 
 
+class BillsAdmin(admin.ModelAdmin):
+    list_display = (
+        "get_tenant_name",
+        "name",
+        "amount",
+        "billing_cycle",
+        "date_paid",
+        "transaction_reference",
+        "due_date",
+        "payment_status"
+    )
+    list_filter = ("payment_status", )
+    search_fields = ["tenant__first_name", "tenant__last_name"]
+
+    def get_tenant_name(self, obj):
+        return " ".join([obj.tenant.first_name, obj.tenant.last_name])
+
+    get_tenant_name.short_description = "Tenant Name"
+
+
 class PaymentScheduleAdmin(admin.ModelAdmin):
     list_display = ("get_tenant_name", "amount_due", "payment_cycle", "tag", "active_schedule", "payment_status")
     search_fields = ["letting__tenant__first_name", "letting__tenant__last_name"]
@@ -194,6 +214,7 @@ admin.site.register(models.PaymentSchedule, PaymentScheduleAdmin)
 admin.site.register(models.PropertyDocument)
 admin.site.register(models.PropertyRunningCosts)
 admin.site.register(models.TenantComment, TenantCommentAdmin)
+admin.site.register(models.Bills, BillsAdmin)
 
 admin.site.site_header = "Pyale Properties"
 admin.site.site_title = "Pyale Properties"

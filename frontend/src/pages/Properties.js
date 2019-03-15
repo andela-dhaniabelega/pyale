@@ -5,7 +5,7 @@ import FooterLinks from '../components/FooterLinks';
 import Aux from '../hoc/Aux_'
 import Navbar from "../components/Navbar";
 import {connect} from "react-redux";
-import {filterProperties, loadProperties} from "../store/actions/properties";
+import {filterProperties, loadProperties} from "../redux/actions/properties";
 import {withRouter} from 'react-router-dom';
 
 

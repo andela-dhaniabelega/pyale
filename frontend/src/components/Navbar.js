@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link, NavLink, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
-import {logout} from "../store/actions/authActions";
+import {logout} from "../redux/actions/authActions";
 
 
 class Navbar extends React.Component {

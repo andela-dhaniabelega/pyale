@@ -14,7 +14,6 @@ from django.db.models.signals import post_save
 from cloudinary.models import CloudinaryField
 import pendulum
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django.utils.html import strip_tags
 from django_rest_passwordreset.signals import reset_password_token_created
 from djmoney.models.fields import MoneyField
@@ -402,25 +401,27 @@ class Letting(DirtyFieldsMixin, models.Model):
         self.clean()
 
         start_date = pendulum.datetime(self.start_date.year, self.start_date.month, self.start_date.day)
-        self.end_date = start_date.add(months=self.duration).subtract(days=1).date()
+        end_date = start_date.add(months=self.duration).subtract(days=1)
+        self.end_date = pendulum.datetime(end_date.year, end_date.month, end_date.day)
 
         modified_fields = self.get_dirty_fields()
 
-        if self.LETTING_START_DATE in modified_fields:
-            raise ValidationError("You cannot edit the start date of an ongoing letting")
+        if not self._state.adding:
+            if self.LETTING_START_DATE in modified_fields:
+                raise ValidationError("You cannot edit the start date of an ongoing letting")
 
-        fields_requiring_schedule_update = {self.TOTAL_LETTING_COST, self.LETTING_DURATION, self.SCHEDULE_TYPE}
-        if any(field in fields_requiring_schedule_update for field in modified_fields) and self.id is not None:
-            # Calculate new letting end date if duration is changed
-            self.end_date = start_date.add(months=self.duration).subtract(days=1).date()
+            fields_requiring_schedule_update = {self.TOTAL_LETTING_COST, self.LETTING_DURATION, self.SCHEDULE_TYPE}
+            if any(field in fields_requiring_schedule_update for field in modified_fields) and self.id is not None:
+                # Calculate new letting end date if duration is changed
+                self.end_date = start_date.add(months=self.duration).subtract(days=1)
 
-            # Deactivate old schedule
-            PaymentSchedule.objects.filter(letting_id=self.id).update(active_schedule=False)
+                # Deactivate old schedule
+                PaymentSchedule.objects.filter(letting_id=self.id).update(active_schedule=False)
 
-            # Create new schedule
-            self.create_payment_schedule(
-                self.schedule_type, self.cost.amount, self.start_date, self.end_date.add(days=1).date(), self.type
-            )
+                # Create new schedule
+                self.create_payment_schedule(
+                    self.schedule_type, self.cost.amount, self.start_date, self.end_date.add(days=1).date(), self.type
+                )
         super().save()
 
     def clean(self):
@@ -525,7 +526,7 @@ class Letting(DirtyFieldsMixin, models.Model):
 
 
 class PaymentSchedule(models.Model):
-    letting = models.ForeignKey(Letting, on_delete=models.CASCADE, editable=False)
+    letting = models.ForeignKey(Letting, on_delete=models.CASCADE, editable=False, related_name="payment_schedules")
     amount_due = MoneyField(
         max_digits=19,
         decimal_places=2,
@@ -598,6 +599,26 @@ class PropertyRecords(models.Model):
     )
 
 
+class Bills(models.Model):
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    amount = MoneyField(
+        max_digits=19,
+        decimal_places=2,
+        default_currency=settings.DEFAULT_CURRENCY,
+        help_text="Amount Due for this bill",
+    )
+    payment_status = models.BooleanField(default=False)
+    description = models.TextField()
+    billing_cycle = models.CharField(max_length=255)
+    date_paid = models.DateTimeField(blank=True, null=True)
+    transaction_reference = models.CharField(max_length=255, blank=True, null=True)
+    due_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Bills"
+        verbose_name_plural = "Bills"
+
 # Signals
 
 
@@ -616,23 +637,63 @@ def update_letting(sender, **kwargs):
     )
 
 
+def create_service_charge_schedule(instance):
+    if instance.duration >= 12:
+        complete_months = instance.duration // 12
+        remainder_months = instance.duration % 12
+        cycles = []
+        computed_payment_date = pendulum.datetime(
+            instance.start_date.year, instance.start_date.month, instance.start_date.day
+        )
+
+        # Since service charge is paid per 12 months, loop over the number of complete 12 months available
+        # in the letting duration and create schedule dates
+        for _ in range(complete_months):
+            to_date = computed_payment_date.add(months=12)
+            cycles.append(
+                (
+                    f"{computed_payment_date.format('DD MMMM YYYY')} to {to_date.format('DD MMMM YYYY')}",
+                    instance.service_charge,
+                )
+            )
+            computed_payment_date = to_date
+        if remainder_months > 0:
+            service_charge_per_month = instance.service_charge / 12
+            remaining_service_charge_amount = service_charge_per_month * remainder_months
+            cycles.append(
+                (
+                    f"{computed_payment_date.format('DD MMMM YYYY')} to "
+                    f"{computed_payment_date.add(months=remainder_months).format('DD MMMM YYYY')}",
+                    remaining_service_charge_amount,
+                )
+            )
+
+        user = User.objects.get(id=instance.tenant.id)
+        for cycle in cycles:
+            Bills.objects.create(
+                tenant=user,
+                name="Service Charge",
+                billing_cycle=cycle[0],
+                amount=cycle[1],
+                description="Service Charge for letting",
+            )
+
+
 @receiver(post_save, sender=Letting)
 def payment_schedule(sender, **kwargs):
     if kwargs.get("created"):
         instance = kwargs.get("instance")
 
         # Create Schedule for service charge
-        PaymentSchedule.objects.create(
-            letting=instance,
-            amount_due=instance.service_charge,
-            payment_status=False,
-            payment_cycle="Annual",
-            tag="Service Charge",
-        )
+        create_service_charge_schedule(instance)
 
         # Create Schedule for Rent
         instance.create_payment_schedule(
-            instance.schedule_type, instance.cost.amount, instance.start_date, instance.end_date.add(days=1)
+            instance.schedule_type,
+            instance.cost.amount,
+            instance.start_date,
+            instance.end_date.add(days=1),
+            instance.type,
         )
 
 

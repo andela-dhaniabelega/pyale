@@ -8,12 +8,13 @@ import TenantPortal from './pages/TenantPortal'
 import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {Provider} from 'react-redux';
-import {persistor, store} from "./store/configureStore";
+import {persistor, store} from "./redux/configureStore";
 import {PersistGate} from 'redux-persist/integration/react'
 import TenantDocument from "./pages/TenantDocument";
 import PasswordReset from "./pages/PasswordReset";
 import PasswordChange from "./pages/PasswordChange";
 import Settings from "./pages/Settings";
+import Bills from "./pages/Bills";
 import HomeFour from "./HomeFour";
 
 
@@ -32,6 +33,7 @@ class Root extends React.Component {
           <Route exact path='/password_change' component={PasswordChange}/>
           <Route exact path='/documents' component={TenantDocument}/>
           <Route exact path='/settings' component={Settings}/>
+          <Route exact path='/bills' component={Bills}/>
         </Switch>
       </BrowserRouter>
     );

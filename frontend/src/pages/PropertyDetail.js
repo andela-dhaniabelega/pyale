@@ -7,7 +7,7 @@ import Aux from '../hoc/Aux_'
 import Navbar from "../components/Navbar";
 import {connect} from "react-redux";
 import queryString from 'query-string';
-import {getProperty} from "../store/actions/properties";
+import {getProperty} from "../redux/actions/properties";
 
 
 class PropertyDetail extends React.Component {

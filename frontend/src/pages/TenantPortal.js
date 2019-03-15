@@ -3,7 +3,7 @@ import Aux from '../hoc/Aux_';
 import Navbar from "../components/Navbar";
 import {connect} from "react-redux";
 import {Link, Redirect, withRouter} from "react-router-dom";
-import {loadUser} from "../store/actions/authActions";
+import {loadUser} from "../redux/actions/authActions";
 import Footer from "../components/Footer";
 import SocialMedia from "../components/SocialMedia";
 import FooterLinks from "../components/FooterLinks";
@@ -79,6 +79,17 @@ class TenantPortal extends React.Component {
                   </h4>
                   <p className="padding-t-15 text-muted">
                     Change your Email or Password
+                  </p>
+                </div>
+              </div>
+              <div className="col-lg-4 margin-t-20">
+                <div className="services-box text-center hover-effect">
+                  <i className="pe-7s-cash text-custom"></i>
+                  <h4 className="padding-t-15 portal-heading">
+                    <Link to="/bills">Bills</Link>
+                  </h4>
+                  <p className="padding-t-15 text-muted">
+                    Manage all bills related to your letting
                   </p>
                 </div>
               </div>

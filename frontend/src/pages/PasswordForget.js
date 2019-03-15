@@ -2,7 +2,7 @@ import React from 'react';
 import Aux from '../hoc/Aux_';
 import {Link, withRouter} from 'react-router-dom';
 import {connect} from "react-redux";
-import {createPasswordResetToken} from "../store/actions/authActions";
+import {createPasswordResetToken} from "../redux/actions/authActions";
 import {FormErrors} from "../components/FormErrors";
 
 class PasswordForget extends React.Component {

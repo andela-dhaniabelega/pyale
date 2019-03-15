@@ -2,7 +2,7 @@ import React from 'react';
 import {Link, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux'
 
-import {login} from '../store/actions/authActions';
+import {login} from '../redux/actions/authActions';
 import Aux from '../hoc/Aux_';
 import {FormErrors} from "../components/FormErrors";
 

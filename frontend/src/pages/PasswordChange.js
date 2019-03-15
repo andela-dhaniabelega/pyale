@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux'
 
-import {initialChangePassword, logout} from '../store/actions/authActions';
+import {initialChangePassword, logout} from '../redux/actions/authActions';
 import Aux from '../hoc/Aux_';
 import {FormErrors} from "../components/FormErrors";
 
