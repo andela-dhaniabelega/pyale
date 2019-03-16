@@ -28,8 +28,8 @@ class Contact extends React.Component {
           <div className="row">
             <div className="col-lg-4">
               <div className="mt-4 pt-4">
-                <p className="mt-4"><span className="h5">Phone Numbers:</span><br/> <span
-                  className="text-muted d-block mt-2">+234 (0)84 423 163<br/> +234 (0)803 300 8341</span></p>
+                <p className="mt-4"><span className="h5">Phone Number:</span><br/> <span
+                  className="text-muted d-block mt-2">+234 818 817 5030</span></p>
                 <p className="mt-4"><span className="h5">Working Hours:</span><br/> <span
                   className="text-muted d-block mt-2">9:00AM To 6:00PM</span></p>
               </div>

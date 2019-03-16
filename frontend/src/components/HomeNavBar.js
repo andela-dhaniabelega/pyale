@@ -17,17 +17,20 @@ class HomeNavBar extends React.Component {
           </button>
           <div className="collapse navbar-collapse" id="navbarCollapse">
             <ul className="navbar-nav navbar-center" id="mySidenav">
-              <li className="nav-item active">
-                <a href="#home" className="nav-link">Home</a>
+              <li className="nav-item">
+                <a href="#commercial" className="nav-link">Commercial</a>
               </li>
               <li className="nav-item">
-                <a href="#sale" className="nav-link">For Sale</a>
+                <a href="#retail" className="nav-link">Retail</a>
               </li>
               <li className="nav-item">
-                <a href="#rent" className="nav-link">For Rent</a>
+                <a href="#residential" className="nav-link">Residential</a>
               </li>
               <li className="nav-item">
-                <a href="#contact" className="nav-link">Contact</a>
+                <Link to="/properties" className="nav-link">All Properties</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/contact" className="nav-link">Contact</Link>
               </li>
             </ul>
             <div className="nav-button ml-auto">

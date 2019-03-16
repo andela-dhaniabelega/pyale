@@ -12,7 +12,7 @@ class Retail extends React.Component {
 
   render() {
     return (
-      <section className="section pt-5" id="rent">
+      <section className="section pt-5" id="retail">
         <div className="container">
           <div className="row">
             <div className="col-lg-8 offset-lg-2">
