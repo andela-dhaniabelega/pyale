@@ -55,7 +55,7 @@ class HomeFour extends React.Component {
             <div className="display-table-cell">
               <div className="container">
                 <div className="row vertical-content">
-                  <div className="col-lg-8 text-white text-left margin-t-5">
+                  <div className="col-lg-8 text-white text-center margin-t-5">
                     <h2 className="home-title">We Build. We Lease. We Rent. </h2>
                     <p className="padding-t-15 home-desc">
                       Pyale Properties leases and rents commercial and residential properties at

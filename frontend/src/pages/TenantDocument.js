@@ -6,6 +6,9 @@ import {getTenantDocuments} from "../redux/actions/tenant";
 import {Redirect} from "react-router-dom";
 import {DocumentItem} from "../components/DocumentItem";
 import {Alert} from "../components/Alert";
+import SocialMedia from "../components/SocialMedia";
+import Footer from "../components/Footer";
+import FooterLinks from "../components/FooterLinks";
 
 
 class TenantDocument extends React.Component {
@@ -39,7 +42,7 @@ class TenantDocument extends React.Component {
       tenantDocuments = <Alert message="Loading Documents..."/>
     } else {
       if (this.state.documents.length === 0) {
-        tenantDocuments = <Alert message="No Documents added"/>
+        tenantDocuments = <div className="padding-b-150"><Alert message="No Documents added"/></div>
       } else {
         tenantDocuments = <DocumentItem document={this.state.documents}/>
       }
@@ -71,6 +74,9 @@ class TenantDocument extends React.Component {
               }
           </div>
         </section>
+        <SocialMedia/>
+        <Footer/>
+        <FooterLinks/>
       </Aux>
     )
   }

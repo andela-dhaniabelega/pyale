@@ -76,7 +76,8 @@ class TenantContact extends React.Component {
                                 name="message"
                                 id="message"
                                 rows="4"
-                                className="form-control"
+                                cols="4"
+                                className="form-control tenant-contact-ta"
                                 placeholder="Please include the address of your letting"
                                 onChange={this.handleChange}
                               ></textarea>
