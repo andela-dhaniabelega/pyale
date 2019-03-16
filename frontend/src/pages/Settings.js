@@ -145,7 +145,7 @@ class TenantDocument extends React.Component {
                     {
                       passwordChangeIncomplete ? (
                         <div className="alert alert-warning" role="alert">
-                          Something went wrong. Please try again
+                          Invalid Password. Please try again
                         </div>
                       ) : ""
                     }
