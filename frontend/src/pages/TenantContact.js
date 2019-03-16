@@ -48,7 +48,7 @@ class TenantContact extends React.Component {
                           <h3 className="font-weight-bold">
                             <Link
                               to="home-one"
-                              className="text-dark text-uppercase account-pages-logo"
+                              className="text-dark text-uppercase"
                             >Contact Support
                             </Link>
                           </h3>
