@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import FooterLinks from "../components/FooterLinks";
 import Aux from '../hoc/Aux_'
 import Navbar from "../components/Navbar"
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import {connect} from "react-redux";
 import {sendSupportEmail} from "../store/actions/email";
 
@@ -30,6 +30,10 @@ class TenantContact extends React.Component {
   };
 
   render() {
+    const {isAuthenticated} = this.props;
+    if (!isAuthenticated) {
+      return <Redirect to="/login"/>
+    }
     return (
       <Aux>
         <Navbar/>
@@ -112,6 +116,7 @@ class TenantContact extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
+    isAuthenticated: state.auth.isAuthenticated,
     user: state.auth.user
   }
 };

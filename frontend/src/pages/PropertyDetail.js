@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import SocialMedia from '../components/SocialMedia';
 import Footer from '../components/Footer';
 import FooterLinks from '../components/FooterLinks';
@@ -38,7 +38,6 @@ class PropertyDetail extends React.Component {
 
   render() {
     const {singleProperty, propertyImages} = this.state;
-    console.log(propertyImages);
     return (
       <Aux>
         <Navbar/>

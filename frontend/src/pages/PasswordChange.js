@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, withRouter, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux'
 
 import {initialChangePassword, logout} from '../redux/actions/authActions';
@@ -87,7 +87,10 @@ class PasswordReset extends React.Component {
 
 
   render() {
-    const { initialPasswordChangeComplete } = this.props;
+    const { initialPasswordChangeComplete, isAuthenticated } = this.props;
+    if (!isAuthenticated) {
+      return <Redirect to="/login"/>
+    }
     return (
       <Aux>
 
