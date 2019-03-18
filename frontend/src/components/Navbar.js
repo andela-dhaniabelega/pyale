@@ -46,8 +46,13 @@ class Navbar extends React.Component {
                 )}
               </li>
               <li className="nav-item">
-                <Link to="/contact" className="nav-link">Contact</Link>
+                {!isAuthenticated ? (
+                  <Link to="/portal" className="nav-link">Contact</Link>
+                ) : (
+                  null
+                )}
               </li>
+
             </ul>
             <div className="nav-button ml-auto">
               <ul className="nav navbar-nav navbar-right">

@@ -1,7 +1,8 @@
 from django.urls import reverse
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from django.forms import ModelForm
+from django.forms import ModelForm, Textarea
+from django import db
 from core import models
 
 
@@ -11,8 +12,15 @@ class PropertyImageInline(admin.TabularInline):
     classes = ["collapse"]
 
 
+class PropertyInventoryInline(admin.TabularInline):
+    model = models.PropertyInventory
+    extra = 0
+    classes = ["collapse"]
+    verbose_name = "Property Inventory"
+
+
 class PropertyAdmin(admin.ModelAdmin):
-    inlines = [PropertyImageInline]
+    inlines = [PropertyImageInline, PropertyInventoryInline]
     list_display = (
         "name",
         "category",
@@ -24,6 +32,12 @@ class PropertyAdmin(admin.ModelAdmin):
     )
     search_fields = ["category"]
     list_filter = ("category",)
+
+
+class PropertyInventoryAdmin(admin.ModelAdmin):
+    list_display = ("item", "current_state", "original_state", "cost_incurred")
+    search_fields = ["item"]
+    formfield_overrides = {db.models.TextField: {"widget": Textarea(attrs={"rows": 3, "cols": 30})}}
 
 
 class PropertyImageAdmin(admin.ModelAdmin):
@@ -141,9 +155,9 @@ class BillsAdmin(admin.ModelAdmin):
         "date_paid",
         "transaction_reference",
         "due_date",
-        "payment_status"
+        "payment_status",
     )
-    list_filter = ("payment_status", )
+    list_filter = ("payment_status",)
     search_fields = ["tenant__first_name", "tenant__last_name"]
 
     def get_tenant_name(self, obj):
@@ -190,12 +204,113 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ("get_tenant_name", "email", "is_active")
     search_fields = ["first_name", "last_name", "email"]
     list_filter = ("is_active",)
-    form = AdminUserForm
+    # form = AdminUserForm
+    fieldsets = (
+
+        ("Registration", {"fields": ("first_name", "last_name", "email", "is_active", "is_superuser")}),
+        (
+            "Bio",
+            {
+                "fields": (
+                    "title",
+                    "middle_name",
+                    "maiden_name",
+                    "nationality",
+                    "gender",
+                    "telephone",
+                    "date_of_birth",
+                    "id_number",
+                    "mobile_number",
+                    "whatsapp_number"
+                )
+            }
+        ),
+        (
+            "Previous Address",
+            {
+                "fields": (
+                    "previous_address_house_number",
+                    "previous_address_house_name",
+                    "previous_address_street",
+                    "previous_address_town",
+                    "previous_address_city",
+                    "previous_address_state",
+                    "previous_address_duration_of_stay",
+                )
+            },
+        ),
+        (
+            "Employment Details",
+            {
+                "fields": (
+                    "employment_status",
+                    "job_title",
+                    "years_at_current_employment",
+                    "employer_name",
+                    "employer_contact_person",
+                    "employer_telephone",
+                    "employer_mobile",
+                    "employer_email",
+                )
+            },
+        ),
+        (
+            "Next of Kin",
+            {
+                "fields": (
+                    "next_of_kin_first_name",
+                    "next_of_kin_last_name",
+                    "next_of_kin_house_number",
+                    "next_of_kin_house_name",
+                    "next_of_kin_street",
+                    "next_of_kin_town",
+                    "next_of_kin_city",
+                    "next_of_kin_state",
+                    "next_of_kin_mobile_1",
+                    "next_of_kin_mobile_2",
+                    "next_of_kin_email",
+                    "next_of_kin_relationship_to_tenant",
+                )
+            },
+        ),
+        (
+            "Current LandLord / Agent",
+            {
+                "fields": (
+                    "landlord_name",
+                    "current_landlord_mobile_1",
+                    "current_landlord_mobile_2",
+                    "current_landlord_email",
+                    "length_of_time_at_last_property",
+                )
+            },
+        ),
+        (
+            "Personal Referee",
+            {
+                "fields": (
+                    "referee_name",
+                    "referee_mobile_number_1",
+                    "referee_mobile_number_2",
+                    "referee_email",
+                    "referee_relationship_to_tenant",
+                )
+            },
+        ),
+    )
 
     def get_tenant_name(self, obj):
         return " ".join([obj.first_name, obj.last_name])
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
+        """
+        Change view allows you pass in extra context to an admin template
+        :param request:
+        :param object_id:
+        :param form_url:
+        :param extra_context:
+        :return:
+        """
         extra_context = extra_context or {}
         tenant_comments = models.TenantComment.objects.filter(tenant_id=object_id)
         extra_context["tenant_comments"] = tenant_comments
@@ -215,6 +330,7 @@ admin.site.register(models.PropertyDocument)
 admin.site.register(models.PropertyRunningCosts)
 admin.site.register(models.TenantComment, TenantCommentAdmin)
 admin.site.register(models.Bills, BillsAdmin)
+admin.site.register(models.PropertyInventory, PropertyInventoryAdmin)
 
 admin.site.site_header = "Pyale Properties"
 admin.site.site_title = "Pyale Properties"

@@ -8,6 +8,7 @@ urlpatterns = [
     path("properties/filter/", views.PropertyFilter.as_view()),
     path("tenant/documents/", views.TenantDocumentList.as_view()),
     path("tenant/<int:pk>/bills/", views.TenantBillsList.as_view()),
+    path("tenant/<int:pk>/lettings/", views.TenantLetting.as_view()),
     path("tenant/support/", views.TenantSupport.as_view()),
     path("tenant/<int:pk>/email/change/", views.EmailChange.as_view()),
     path("rest-auth/", include("rest_auth.urls")),

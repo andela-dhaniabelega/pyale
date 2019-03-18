@@ -28,3 +28,16 @@ export const getTenantBills = () => {
   }
 };
 
+export const getTenantLettings = () => {
+  return (dispatch, getState) => {
+    const headers = setAuthHeader(getState);
+    const id = getState().auth.user.id;
+    return axios.get(`${constants.LOCAL_HOST}/api/v1/tenant/${id}/lettings/`, {headers})
+      .then((res) => {
+        dispatch({type: 'TENANT_LETTINGS_LOAD_SUCCESS', data: res.data})
+      }).catch((error) => {
+        console.log(error)
+      })
+  }
+};
+

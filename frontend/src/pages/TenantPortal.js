@@ -64,7 +64,7 @@ class TenantPortal extends React.Component {
                 <div className="services-box text-center hover-effect">
                   <i className="pe-7s-home text-custom"></i>
                   <h4 className="padding-t-15 portal-heading">
-                    <Link to="/documents">My Letting</Link>
+                    <Link to="/my_letting">My Letting</Link>
                   </h4>
                   <p className="padding-t-15 text-muted">
                     Access all relevant information related to your letting

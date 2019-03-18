@@ -12,6 +12,10 @@ class UnPaidBills extends React.Component {
     })
   };
 
+  handlePay = () => {
+    console.log('entered')
+  };
+
   callBack = () => {
     $('#myModal').hide();
     $('.modal-backdrop').hide();
@@ -60,6 +64,7 @@ class UnPaidBills extends React.Component {
                         type="button"
                         data-toggle="modal"
                         data-target="#myModal"
+                        onClick={this.handlePay}
                       >
                         Pay
                       </button>

@@ -157,6 +157,18 @@ b {
     -webkit-flex-direction: row;
 }
 
+.non-vertical-content {
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    -webkit-justify-content: center;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+}
+
+
 .bg-overlay {
     background: linear-gradient(to right, #512DA8, #711e72);
     opacity: 0.9;
@@ -216,6 +228,13 @@ b {
     height: 2px;
     margin-right: auto;
     margin-left: auto;
+    margin-bottom: 1rem;
+    background-color: #fb3e3e;
+}
+
+.my-letting-section-title-border {
+    width: 50px;
+    height: 2px;
     margin-bottom: 1rem;
     background-color: #fb3e3e;
 }
@@ -1565,4 +1584,21 @@ caption {
     margin-top: 0 !important;
     margin-bottom: 20px !important;
     height: 221px !important;
+}
+
+
+ul.letting-summary {
+    list-style: none outside none;
+    margin: 0 0 0px;
+    overflow: hidden;
+    padding: 0;
+    border-radius: 0px;
+}
+
+.letting-summary-container {
+    margin-bottom: 1rem;
+}
+
+.m-l-10 {
+    padding-right: 10px;
 }

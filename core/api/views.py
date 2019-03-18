@@ -80,33 +80,33 @@ class PropertyFilter(generics.ListAPIView):
     permission_classes = ()
 
     def get_queryset(self):
-        categories = self.request.query_params.get('categories', None).split(',')
-        location = self.request.query_params.get('location', None)
+        categories = self.request.query_params.get("categories", None).split(",")
+        location = self.request.query_params.get("location", None)
 
-        if categories and '' not in categories:
-            if location and location != 'all':
+        if categories and "" not in categories:
+            if location and location != "all":
                 return models.Property.objects.filter(category__in=categories, location__exact=location)
             else:
                 return models.Property.objects.filter(category__in=categories)
-        elif location and location != 'all':
-                return models.Property.objects.filter(location=location)
+        elif location and location != "all":
+            return models.Property.objects.filter(location=location)
 
         return models.Property.objects.all()
 
-class TenantSupport(APIView):
 
+class TenantSupport(APIView):
     def post(self, request, format=None):
-        from_email = request.data.get('email')
-        message = request.data.get('message')
-        first_name = request.data.get('first_name')
-        last_name = request.data.get('last_name')
-        subject = request.data.get('subject')
+        from_email = request.data.get("email")
+        message = request.data.get("message")
+        first_name = request.data.get("first_name")
+        last_name = request.data.get("last_name")
+        subject = request.data.get("subject")
 
         msg = EmailMultiAlternatives(
             subject=f"Support Request from {first_name} {last_name}: " + subject,
             body=message,
             from_email=from_email,
-            to=['support@pyaleproperties.com'],
+            to=["support@pyaleproperties.com"],
             reply_to=[from_email],
         )
         try:
@@ -115,3 +115,13 @@ class TenantSupport(APIView):
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=e)
         else:
             return Response(data="Success", status=status.HTTP_200_OK)
+
+
+class TenantLetting(generics.ListAPIView):
+    model = models.Letting
+    serializer_class = serializers.TenantLettingSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        pk = self.request.user.id
+        return models.Letting.objects.filter(tenant_id=pk)

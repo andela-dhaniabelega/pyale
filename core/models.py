@@ -62,6 +62,59 @@ class User(AbstractBaseUser, PermissionsMixin):
     temp_password_expiry = models.DateTimeField(null=True, blank=True)
     temp_password = models.CharField(max_length=50, null=True, blank=True)
     is_previously_logged_in = models.BooleanField(default=False, blank=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+    middle_name = models.CharField(max_length=255, blank=True, null=True)
+    maiden_name = models.CharField(max_length=255, blank=True, null=True)
+    nationality = models.CharField(max_length=255, blank=True, null=True)
+    gender = models.CharField(max_length=255, blank=True, null=True)
+    telephone = models.CharField(max_length=255, blank=True, null=True)
+    date_of_birth = models.CharField(max_length=255, blank=True, null=True)
+    id_number = models.CharField(max_length=255, blank=True, null=True)
+    mobile_number = models.CharField(max_length=255, blank=True, null=True)
+    whatsapp_number = models.CharField(max_length=255, blank=True, null=True)
+    previous_address_house_number = models.CharField(max_length=255, blank=True, null=True, verbose_name="House Number")
+    previous_address_house_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="House Name")
+    previous_address_street = models.CharField(max_length=255, blank=True, null=True, verbose_name="Street")
+    previous_address_town = models.CharField(max_length=255, blank=True, null=True, verbose_name="Town")
+    previous_address_city = models.CharField(max_length=255, blank=True, null=True, verbose_name="City")
+    previous_address_state = models.CharField(max_length=100, blank=True, null=True, verbose_name="State")
+    previous_address_duration_of_stay = models.CharField(
+        max_length=50, blank=True, null=True, verbose_name="Duration of Stay"
+    )
+    employment_status = models.CharField(max_length=50, blank=True, null=True)
+    job_title = models.CharField(max_length=255, blank=True, null=True)
+    years_at_current_employment = models.CharField(max_length=50, blank=True, null=True)
+    employer_name = models.CharField(max_length=255, blank=True, null=True)
+    employer_contact_person = models.CharField(max_length=255, blank=True, null=True, verbose_name="Contact Person")
+    employer_telephone = models.CharField(max_length=100, blank=True, null=True, verbose_name="Telephone")
+    employer_mobile = models.CharField(max_length=100, blank=True, null=True, verbose_name="Mobile")
+    employer_email = models.CharField(max_length=100, blank=True, null=True, verbose_name="Email")
+    next_of_kin_first_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="First Name")
+    next_of_kin_last_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Last Name")
+    next_of_kin_house_number = models.CharField(max_length=50, blank=True, null=True, verbose_name="House Number")
+    next_of_kin_house_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="House Name")
+    next_of_kin_street = models.CharField(max_length=255, blank=True, null=True, verbose_name="Street")
+    next_of_kin_town = models.CharField(max_length=255, blank=True, null=True, verbose_name="Town")
+    next_of_kin_city = models.CharField(max_length=255, blank=True, null=True, verbose_name="City")
+    next_of_kin_state = models.CharField(max_length=100, blank=True, null=True, verbose_name="State")
+    next_of_kin_mobile_1 = models.CharField(max_length=255, blank=True, null=True, verbose_name="Mobile 1")
+    next_of_kin_mobile_2 = models.CharField(max_length=255, blank=True, null=True, verbose_name="Mobile 2")
+    next_of_kin_email = models.CharField(max_length=255, blank=True, null=True, verbose_name="Email")
+    next_of_kin_relationship_to_tenant = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Realtionship to Tenant"
+    )
+    landlord_name = models.CharField(max_length=255, blank=True, null=True)
+    current_landlord_mobile_1 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Mobile 1")
+    current_landlord_mobile_2 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Mobile 2")
+    current_landlord_email = models.CharField(max_length=100, blank=True, null=True, verbose_name="Email")
+    length_of_time_at_last_property = models.CharField(max_length=50, blank=True, null=True)
+    referee_name = models.CharField(max_length=255, blank=True, null=True)
+    referee_mobile_number_1 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Mobile 1")
+    referee_mobile_number_2 = models.CharField(max_length=100, blank=True, null=True, verbose_name="Mobile 2")
+    referee_email = models.CharField(max_length=100, blank=True, null=True, verbose_name="Email")
+    referee_relationship_to_tenant = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Relationship to Tenant"
+    )
 
     objects = UserManager()
 
@@ -170,8 +223,22 @@ class Property(models.Model):
         verbose_name_plural = "Properties"
 
 
+class PropertyInventory(models.Model):
+    realty = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name="Property")
+    item = models.CharField(max_length=255)
+    current_state = models.TextField(max_length=512)
+    original_state = models.TextField(max_length=512)
+    cost_incurred = MoneyField(
+        max_digits=19, decimal_places=2, default_currency=settings.DEFAULT_CURRENCY, blank=True, null=True
+    )
+
+    class Meta:
+        verbose_name = "Property Inventory"
+        verbose_name_plural = "Property Inventories"
+
+
 class PropertyRunningCosts(models.Model):
-    realty = models.ForeignKey(Property, on_delete=models.CASCADE)
+    realty = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name="Property")
     cost_description = models.TextField()
     amount_spent = MoneyField(max_digits=19, decimal_places=2, default_currency=settings.DEFAULT_CURRENCY)
 
@@ -184,7 +251,9 @@ class PropertyRunningCosts(models.Model):
 
 
 class PropertyImage(DirtyFieldsMixin, models.Model):
-    realty = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_images")
+    realty = models.ForeignKey(
+        Property, on_delete=models.CASCADE, related_name="property_images", verbose_name="Property"
+    )
     image = CloudinaryField("image")
     image_details = JSONField(max_length=255, null=True, blank=True)
     tag = models.CharField(max_length=255, help_text="A tag name for this image")
@@ -229,7 +298,7 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
 
 
 class PropertyDocument(DirtyFieldsMixin, models.Model):
-    realty = models.ForeignKey(Property, on_delete=models.CASCADE)
+    realty = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name="Property")
     document = CloudinaryField()
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
@@ -338,7 +407,7 @@ class Letting(DirtyFieldsMixin, models.Model):
     MONTHLY = "monthly"
 
     tenant = models.ForeignKey(User, on_delete=models.CASCADE)
-    realty = models.ForeignKey(Property, on_delete=models.CASCADE)
+    realty = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name="Property")  # TODO: Use One-to-One
     type = models.CharField(max_length=50, default="Rent", choices=LETTING_TYPES)
     duration = models.IntegerField(default=0, help_text="Letting period (must be in months)")
     start_date = models.DateField()
@@ -619,6 +688,7 @@ class Bills(models.Model):
         verbose_name = "Bills"
         verbose_name_plural = "Bills"
 
+
 # Signals
 
 
@@ -649,7 +719,7 @@ def create_service_charge_schedule(instance):
         # Since service charge is paid per 12 months, loop over the number of complete 12 months available
         # in the letting duration and create schedule dates
         for _ in range(complete_months):
-            to_date = computed_payment_date.add(months=12)
+            to_date = computed_payment_date.add(months=12).subtract(days=1)
             cycles.append(
                 (
                     f"{computed_payment_date.format('DD MMMM YYYY')} to {to_date.format('DD MMMM YYYY')}",
@@ -703,7 +773,7 @@ def send_registration_email(sender, **kwargs):
         instance = kwargs.get("instance")
         subject = "Pyale Properties Tenant Portal"
         message = f"""Dear {instance.first_name}, <br/> <br/> We are happy 
-        to introduce you to our Tenant Portal. Within the tenant portal you can: <ul><li>Pay Electricity Bills
+        to introduce you to our Tenant Portal. Within the tenant portal you can: <ul><li>Pay Bills
         </li><li>Review Documents related to your Tenancy</li><li>Contact us with any issues you may have 
         regarding your tenancy</li><li>And much more</li></ul>. <br/>To access this portal, 
         Visit <a href="">http://pyaleproperties.com/login</a> and login with the your email and temporary 

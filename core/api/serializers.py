@@ -147,6 +147,14 @@ class PropertySerializer(serializers.ModelSerializer):
         )
 
 
+class TenantLettingSerializer(serializers.ModelSerializer):
+    realty = PropertySerializer(read_only=True)
+
+    class Meta:
+        model = models.Letting
+        fields = "__all__"
+
+
 class TenantDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TenantDocument
@@ -159,16 +167,7 @@ class PaymentScheduleSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class LettingSerializer(serializers.ModelSerializer):
-    payment_schedules = PaymentScheduleSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = models.Letting
-        fields = "__all__"
-
-
 class BillsSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Bills
         fields = "__all__"
@@ -181,7 +180,55 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "first_name", "last_name", "email", "password", "is_previously_logged_in")
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "email",
+            "is_previously_logged_in",
+            "title",
+            "middle_name",
+            "maiden_name",
+            "nationality",
+            "gender",
+            "telephone",
+            "date_of_birth",
+            "id_number",
+            "mobile_number",
+            "whatsapp_number",
+            "previous_address_house_number",
+            "previous_address_house_name",
+            "previous_address_street",
+            "previous_address_town",
+            "previous_address_city",
+            "previous_address_state",
+            "previous_address_duration_of_stay",
+            "employment_status",
+            "job_title",
+            "years_at_current_employment",
+            "employer_name",
+            "employer_contact_person",
+            "employer_telephone",
+            "employer_mobile",
+            "employer_email",
+            "next_of_kin_first_name",
+            "next_of_kin_last_name",
+            "next_of_kin_house_number",
+            "next_of_kin_house_name",
+            "next_of_kin_street",
+            "next_of_kin_town",
+            "next_of_kin_city",
+            "next_of_kin_state",
+            "next_of_kin_mobile_1",
+            "next_of_kin_mobile_2",
+            "next_of_kin_email",
+            "next_of_kin_relationship_to_tenant",
+            "referee_name",
+            "referee_mobile_number_1",
+            "referee_mobile_number_2",
+            "referee_email",
+            "referee_relationship_to_tenant",
+        )
 
 
 class EmailChangeSerializer(serializers.ModelSerializer):

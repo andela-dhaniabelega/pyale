@@ -18,6 +18,7 @@ import Bills from "./pages/Bills";
 import HomeFour from "./HomeFour";
 import Contact from "./components/Contact";
 import TenantContact from "./pages/TenantContact";
+import MyLetting from "./pages/MyLetting";
 
 
 class Root extends React.Component {
@@ -38,6 +39,7 @@ class Root extends React.Component {
           <Route exact path='/contact' component={Contact}/>
           <Route exact path='/support' component={TenantContact}/>
           <Route exact path='/bills' component={Bills}/>
+          <Route exact path='/my_letting' component={MyLetting}/>
         </Switch>
       </BrowserRouter>
     );

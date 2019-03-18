@@ -1,6 +1,7 @@
 const initState = {
   documents: [],
-  bills: []
+  bills: [],
+  lettings: null
 };
 
 const tenant = (state = initState, action) => {
@@ -14,6 +15,11 @@ const tenant = (state = initState, action) => {
       return {
         ...state,
         bills: action.data
+      };
+    case 'TENANT_LETTINGS_LOAD_SUCCESS':
+      return {
+        ...state,
+        lettings: action.data
       };
     default:
       return state
