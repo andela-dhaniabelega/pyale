@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'Dinpro';
+    src: url("../fonts/Dinpro.86fda98796bb.ttf") format('truetype'); /* Safari, Android, iOS */
+}
+
+*, html, body {
+    font-family: 'Dinpro', 'Helvetica', sans-serif;
+    font-size: 14px;
+}
+
+#id_total_cost_1, #id_total_letting_cost_1, #id_deposit_1, #id_service_charge_1 {
+    margin-top: -4px;
+    margin-left: 2px;
+}
+
+.lsls {
+    color: red;
+    background: red;
+}
