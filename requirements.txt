@@ -33,3 +33,5 @@ whitenoise==3.3.1
 django_rest_passwordreset==0.9.7
 django-cors-headers==2.4.0
 django-rest-auth==0.9.3
+django-heroku==0.3.1
+dj-database-url==0.5.0
