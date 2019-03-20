@@ -47,7 +47,7 @@ class Navbar extends React.Component {
               </li>
               <li className="nav-item">
                 {!isAuthenticated ? (
-                  <Link to="/portal" className="nav-link">Contact</Link>
+                  <Link to="/contact" className="nav-link">Contact</Link>
                 ) : (
                   null
                 )}

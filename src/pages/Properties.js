@@ -51,6 +51,7 @@ class Properties extends React.Component {
   };
 
   showPropertyDetail = (e) => {
+    // A random comment
     const {param} = e.target.dataset;
     this.props.history.push({
       pathname: '/detail',
