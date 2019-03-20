@@ -29,7 +29,7 @@ SECRET_KEY = 'xi0^o_&%3-^w$k=pdv4g6j3p^81ehurhvhsdt)2f4mhax676oi'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pyaleproperties.herokuapp.com', '127.0.0.1:8000', '127.0.0.1:3000']
 
 # Application definition
 CORS_ORIGIN_ALLOW_ALL = True
@@ -203,3 +203,7 @@ EMAIL_HOST_USER = os.environ.get('SEND_GRID_EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('SEND_GRID_EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+# Static config
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
