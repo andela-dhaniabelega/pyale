@@ -15,7 +15,6 @@ class MyLetting extends React.Component {
   }
 
   render() {
-    console.log(this.props.lettings);
     const {isAuthenticated, user, lettings} = this.props;
     if (!isAuthenticated) {
       return <Redirect to="/login"/>

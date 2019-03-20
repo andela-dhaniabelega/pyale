@@ -60,8 +60,6 @@ class UnPaidBills extends React.Component {
     if (!isAuthenticated) {
       return <Redirect to="/login"/>
     }
-    // this.getUnPaidBills();
-    console.log(this.state.unpaidBills);
 
     return (
       <div className="table-responsive">

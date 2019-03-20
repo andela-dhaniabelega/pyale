@@ -5,7 +5,7 @@ import FooterLinks from "../components/FooterLinks";
 import Aux from '../hoc/Aux_'
 import Navbar from "../components/Navbar"
 import {connect} from "react-redux";
-import {sendEnquiryEmail, sendSupportEmail} from "../redux/actions/email";
+import {sendEnquiryEmail} from "../redux/actions/email";
 
 
 class Contact extends React.Component {
