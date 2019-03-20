@@ -16,16 +16,9 @@ class Bills extends React.Component {
     bills: [],
   };
 
-  componentWillMount() {
-    this.props.getTenantBills().then(() => {
-      if (this.props.bills && this.props.bills.length > 0) {
-        this.setState({bills: this.props.bills})
-      }
-    })
-  }
 
   render() {
-    const {isAuthenticated} = this.props;
+    const {isAuthenticated, billUpdated} = this.props;
     const {bills} = this.state;
     if (!isAuthenticated) {
       return <Redirect to="/login"/>
@@ -48,9 +41,15 @@ class Bills extends React.Component {
                 <p className="section-subtitle text-muted text-center padding-t-30 font-secondary">
                   Manage all bills
                 </p>
+                {
+                  billUpdated &&
+                  <div className="alert alert-success" role="alert">
+                    Payment Successful
+                  </div>
+                }
               </div>
-              <UnPaidBills bills={bills}/>
-              <PaidBills bills={bills}/>
+              <UnPaidBills getTenantBills={this.props.getTenantBills}/>
+              <PaidBills getTenantBills={this.props.getTenantBills}/>
             </div>
           </div>
         </section>
@@ -65,7 +64,9 @@ class Bills extends React.Component {
 const mapStateToProps = (state) => {
   return {
     bills: state.tenant.bills,
+    billUpdated: state.tenantReset.billUpdated,
     isAuthenticated: state.auth.isAuthenticated,
+
   }
 };
 

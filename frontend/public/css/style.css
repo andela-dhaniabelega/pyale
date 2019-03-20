@@ -1602,3 +1602,7 @@ ul.letting-summary {
 .m-l-10 {
     padding-right: 10px;
 }
+
+.thead-red {
+    background-color: #fb3e3e !important;
+}

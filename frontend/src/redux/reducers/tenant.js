@@ -1,7 +1,8 @@
 const initState = {
   documents: [],
   bills: [],
-  lettings: null
+  lettings: null,
+  billUpdated: false
 };
 
 const tenant = (state = initState, action) => {
@@ -20,6 +21,11 @@ const tenant = (state = initState, action) => {
       return {
         ...state,
         lettings: action.data
+      };
+    case 'TENANT_BILLS_UPDATE_SUCCESS':
+      return {
+        ...state,
+        billUpdated: true
       };
     default:
       return state

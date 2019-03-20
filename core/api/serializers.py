@@ -239,3 +239,10 @@ class EmailChangeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email",)
+
+
+class TenantBillsUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Bills
+        fields = ("payment_status", "date_paid")

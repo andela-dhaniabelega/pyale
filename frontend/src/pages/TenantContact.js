@@ -6,7 +6,7 @@ import Aux from '../hoc/Aux_'
 import Navbar from "../components/Navbar"
 import {Link, Redirect} from "react-router-dom";
 import {connect} from "react-redux";
-import {sendSupportEmail} from "../store/actions/email";
+import {sendSupportEmail} from "../redux/actions/email";
 
 
 class TenantContact extends React.Component {
@@ -15,10 +15,11 @@ class TenantContact extends React.Component {
     subject: "",
     first_name: this.props.user.first_name,
     last_name: this.props.user.last_name,
-    email: this.props.user.email
+    email: this.props.user.email,
+    isLoading: false
   };
 
-   handleChange = (e) => {
+  handleChange = (e) => {
     this.setState({
       [e.target.id]: e.target.value
     })
@@ -26,11 +27,20 @@ class TenantContact extends React.Component {
 
   handleSendEmail = (e) => {
     e.preventDefault();
-    this.props.sendSupportEmail(this.state)
+    this.setState({isLoading: true});
+    this.props.sendSupportEmail(this.state).then(() => {
+      if (this.props.supportEmailSent) {
+        this.setState({
+          message: "",
+          subject: "",
+          isLoading: false
+        })
+      }
+    })
   };
 
   render() {
-    const {isAuthenticated} = this.props;
+    const {isAuthenticated, supportEmailSent} = this.props;
     if (!isAuthenticated) {
       return <Redirect to="/login"/>
     }
@@ -62,6 +72,12 @@ class TenantContact extends React.Component {
                           </p>
                         </div>
                         <div className="p-3">
+                          {
+                            supportEmailSent &&
+                            <div className="alert alert-success" role="alert">
+                              Email Sent Successfully
+                            </div>
+                          }
                           <form onSubmit={this.handleSubmit}>
                             <div className="form-group">
                               <label htmlFor="email">Subject:</label>
@@ -69,6 +85,7 @@ class TenantContact extends React.Component {
                                 type="text"
                                 className="form-control"
                                 id="subject"
+                                value={this.state.subject}
                                 placeholder="Enter subject"
                                 onChange={this.handleChange}
                               />
@@ -84,6 +101,7 @@ class TenantContact extends React.Component {
                                 className="form-control tenant-contact-ta"
                                 placeholder="Please include the address of your letting"
                                 onChange={this.handleChange}
+                                value={this.state.message}
                               ></textarea>
                             </div>
 
@@ -93,7 +111,7 @@ class TenantContact extends React.Component {
                                 className="btn btn-custom btn-block"
                                 onClick={this.handleSendEmail}
                               >
-                                Send Message
+                                {this.state.isLoading? "Sending..." : "Send Message"}
                               </button>
                             </div>
                           </form>
@@ -117,7 +135,8 @@ class TenantContact extends React.Component {
 const mapStateToProps = (state) => {
   return {
     isAuthenticated: state.auth.isAuthenticated,
-    user: state.auth.user
+    user: state.auth.user,
+    supportEmailSent: state.email.supportEmailSent
   }
 };
 

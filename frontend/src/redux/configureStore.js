@@ -9,7 +9,7 @@ const persistConfig = {
   key: 'root',
   storage,
   whitelist: ['auth'],
-  blacklist: ['authReset']
+  blacklist: ['authReset', 'tenantReset']
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

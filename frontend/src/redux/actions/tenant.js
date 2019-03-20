@@ -41,3 +41,20 @@ export const getTenantLettings = () => {
   }
 };
 
+export const updateBillPaymentStatus = (id, date) => {
+  return (dispatch, getState) => {
+    const headers = setAuthHeader(getState);
+    return axios.patch(
+      `${constants.LOCAL_HOST}/api/v1/tenant/${id}/bills/update/`,
+      {'payment_status': true, 'date_paid': date},
+      {headers}
+      ).then((res) => {
+        dispatch({type: 'TENANT_BILLS_UPDATE_SUCCESS'})
+      }).catch((error) => {
+        console.log(error)
+      })
+  }
+};
+
+
+

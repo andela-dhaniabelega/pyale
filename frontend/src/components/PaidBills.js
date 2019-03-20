@@ -4,19 +4,28 @@ import {Redirect, withRouter} from "react-router-dom";
 
 
 class UnPaidBills extends React.Component {
-
-  getPaidBills = (bills) => {
-    return bills.filter((bill) => {
-      return bill.payment_status
-    })
+  state = {
+    paidBills: []
   };
 
+  componentWillMount() {
+    this.props.getTenantBills().then(() => {
+      if (this.props.bills) {
+        const paidBills = this.props.bills.filter((bill) => {
+          return bill.payment_status
+        });
+        this.setState({paidBills})
+      }
+    });
+  }
+
   render() {
-    const {isAuthenticated, bills} = this.props;
+    const {isAuthenticated} = this.props;
+    const {paidBills} = this.state;
     if (!isAuthenticated) {
       return <Redirect to="/login"/>
     }
-    const paidBills = this.getPaidBills(bills);
+
 
     return (
       <div className="table-responsive">
@@ -28,7 +37,7 @@ class UnPaidBills extends React.Component {
             <th scope="col">Bill</th>
             <th scope="col">Amount</th>
             <th scope="col">Duration</th>
-            <th scope="col"></th>
+            <th scope="col">Payment Date</th>
           </tr>
           </thead>
           <tbody>
@@ -38,12 +47,10 @@ class UnPaidBills extends React.Component {
                 return (
                   <tr>
                     <td>{index + 1}</td>
-                    <td>Service Charge</td>
-                    <td>{item.amount_due}</td>
-                    <td>{item.payment_cycle}</td>
-                    <td>
-                      <button>Pay Online</button>
-                    </td>
+                    <td>{item.name}</td>
+                    <td>{item.amount_currency + item.amount}</td>
+                    <td>{item.billing_cycle}</td>
+                    <td>{item.date_paid}</td>
                   </tr>
                 )
               }) : paidBills.length === 0 ? <tr className="text-center"><td colSpan="5">No Paid Bills</td></tr> : ""
@@ -58,6 +65,7 @@ class UnPaidBills extends React.Component {
 const mapStateToProps = (state) => {
   return {
     isAuthenticated: state.auth.isAuthenticated,
+    bills: state.tenant.bills
   }
 };
 

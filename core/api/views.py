@@ -65,6 +65,21 @@ class TenantBillsList(generics.ListAPIView):
         return models.Bills.objects.filter(tenant__id=pk)
 
 
+class TenantBillsUpdate(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self, pk):
+        return models.Bills.objects.get(id=pk)
+
+    def patch(self, request, pk):
+        instance = self.get_object(pk)
+        serializer = serializers.TenantBillsUpdateSerializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 class EmailChange(generics.UpdateAPIView):
     serializer_class = serializers.EmailChangeSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -95,6 +110,8 @@ class PropertyFilter(generics.ListAPIView):
 
 
 class TenantSupport(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
     def post(self, request, format=None):
         from_email = request.data.get("email")
         message = request.data.get("message")
@@ -107,6 +124,30 @@ class TenantSupport(APIView):
             body=message,
             from_email=from_email,
             to=["support@pyaleproperties.com"],
+            reply_to=[from_email],
+        )
+        try:
+            msg.send()
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=e)
+        else:
+            return Response(data="Success", status=status.HTTP_200_OK)
+
+
+class TenantEnquiry(APIView):
+    permission_classes = ()
+
+    def post(self, request, format=None):
+        from_email = request.data.get("email")
+        message = request.data.get("message")
+        name = request.data.get("name")
+        subject = request.data.get("subject")
+
+        msg = EmailMultiAlternatives(
+            subject=f"Enquiry from {name}: " + subject,
+            body=message,
+            from_email=from_email,
+            to=["info@pyaleproperties.com"],
             reply_to=[from_email],
         )
         try:

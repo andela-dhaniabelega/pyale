@@ -680,7 +680,7 @@ class Bills(models.Model):
     payment_status = models.BooleanField(default=False)
     description = models.TextField()
     billing_cycle = models.CharField(max_length=255)
-    date_paid = models.DateTimeField(blank=True, null=True)
+    date_paid = models.CharField(max_length=255, blank=True, null=True)
     transaction_reference = models.CharField(max_length=255, blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
 
