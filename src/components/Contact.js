@@ -1,9 +1,9 @@
 import React from 'react';
-import SocialMedia from "../components/SocialMedia";
-import Footer from "../components/Footer";
-import FooterLinks from "../components/FooterLinks";
+import SocialMedia from "./SocialMedia";
+import Footer from "./Footer";
+import FooterLinks from "./FooterLinks";
 import Aux from '../hoc/Aux_'
-import Navbar from "../components/Navbar"
+import Navbar from "./Navbar"
 import {connect} from "react-redux";
 import {sendEnquiryEmail} from "../redux/actions/email";
 
