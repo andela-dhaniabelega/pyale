@@ -19,7 +19,6 @@ class Bills extends React.Component {
 
   render() {
     const {isAuthenticated, billUpdated} = this.props;
-    const {bills} = this.state;
     if (!isAuthenticated) {
       return <Redirect to="/login"/>
     }
