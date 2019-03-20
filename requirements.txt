@@ -30,3 +30,4 @@ toml==0.10.0
 urllib3==1.24.1
 gunicorn==19.7.1
 whitenoise==3.3.1
+-e git://github.com/darklow/django-suit.git@v2#egg=django-suit
