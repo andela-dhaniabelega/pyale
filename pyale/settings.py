@@ -98,7 +98,7 @@ ROOT_URLCONF = 'pyale.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'core/templates/')],
+        'DIRS': [os.path.join(BASE_DIR, 'core/templates/'), os.path.join(BASE_DIR, 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -168,6 +168,8 @@ MAX_RENT_MONTHS = 60
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # Cloudinary Configuration
 
@@ -206,8 +208,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # Static config
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
