@@ -4,6 +4,9 @@
     "postdeploy": "pg_dump $DATABASE_URL | psql $DATABASE_URL && python ./manage.py migrate"
   },
   "env": {
+    "DATABASE_URL": {
+      "required": true
+    },
     "PYALE_CLOUDINARY_API_KEY": {
       "required": true
     },
