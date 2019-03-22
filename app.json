@@ -1,0 +1,58 @@
+{
+  "name": "pyale",
+  "scripts": {
+    "postdeploy": "pg_dump $DATABASE_URL | psql $DATABASE_URL && python ./manage.py migrate"
+  },
+  "env": {
+    "PYALE_CLOUDINARY_API_KEY": {
+      "required": true
+    },
+    "PYALE_CLOUDINARY_API_SECRET": {
+      "required": true
+    },
+    "PYALE_CLOUDINARY_CLOUD_NAME": {
+      "required": true
+    },
+    "PYALE_DATABASE_NAME": {
+      "required": true
+    },
+    "PYALE_DATABASE_PASSWORD": {
+      "required": true
+    },
+    "PYALE_DATABASE_USER": {
+      "required": true
+    },
+    "PYALE_EMAIL_HOST_PASSWORD": {
+      "required": true
+    },
+    "SECRET_KEY": {
+      "required": true
+    },
+    "SEND_GRID_API_KEY": {
+      "required": true
+    },
+    "SEND_GRID_EMAIL_HOST_PASSWORD": {
+      "required": true
+    },
+    "SEND_GRID_EMAIL_HOST_USER": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "stack": "heroku-18"
+}
