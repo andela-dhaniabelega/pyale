@@ -1,19 +1,19 @@
 from django.urls import reverse
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from django.forms import ModelForm, Textarea
-from django import db
-from core import models
+from django.forms import ModelForm, Textarea, TextInput
+from django.db import models
+from core import models as core_models
 
 
 class PropertyImageInline(admin.TabularInline):
-    model = models.PropertyImage
+    model = core_models.PropertyImage
     extra = 0
     classes = ["collapse"]
 
 
 class PropertyInventoryInline(admin.TabularInline):
-    model = models.PropertyInventory
+    model = core_models.PropertyInventory
     extra = 0
     classes = ["collapse"]
     verbose_name = "Property Inventory"
@@ -37,16 +37,26 @@ class PropertyAdmin(admin.ModelAdmin):
 class PropertyInventoryAdmin(admin.ModelAdmin):
     list_display = ("item", "current_state", "original_state", "cost_incurred")
     search_fields = ["item"]
-    formfield_overrides = {db.models.TextField: {"widget": Textarea(attrs={"rows": 3, "cols": 30})}}
+    formfield_overrides = {models.TextField: {"widget": Textarea(attrs={"rows": 3, "cols": 30})}}
 
 
 class PropertyImageAdmin(admin.ModelAdmin):
     list_display = ("tag", "realty")
     search_fields = ["tag"]
+    exclude = ("image_details",)
+
+
+class PropertyRunningCostAdmin(admin.ModelAdmin):
+    list_display = ("property_name", "cost_description", "amount_spent")
+
+    def property_name(self, instance):
+        return instance.realty.name
+
+    property_name.short_description = "Property"
 
 
 class PaymentScheduleInline(admin.TabularInline):
-    model = models.PaymentSchedule
+    model = core_models.PaymentSchedule
     extra = 0
     classes = ["collapse"]
     verbose_name = "Payment Schedule"
@@ -59,7 +69,7 @@ class LettingAdmin(admin.ModelAdmin):
 
 
 class LettingInline(admin.TabularInline):
-    model = models.Letting
+    model = core_models.Letting
     extra = 0
     classes = ["collapse"]
     fields = (
@@ -102,7 +112,7 @@ class LettingInline(admin.TabularInline):
 
 
 class TenantDocumentInline(admin.TabularInline):
-    model = models.TenantDocument
+    model = core_models.TenantDocument
     ordering = ("name",)
     extra = 0
     classes = ["collapse"]
@@ -133,6 +143,25 @@ class LettingAdmin(admin.ModelAdmin):
         "schedule_type",
     )
     search_fields = ["tenant__first_name", "tenant__last_name"]
+    fieldsets = (
+        (
+            "Basic",
+            {
+                "fields": (
+                    "tenant",
+                    "realty",
+                    "type",
+                    "duration",
+                    "start_date",
+                    "cost",
+                    "schedule_type",
+                    "service_charge",
+                )
+            },
+        ),
+        ("Deposit", {"fields": ("deposit", "deposit_refunded", "deposit_refund_date")}),
+        ("Default", {"fields": ("defaulting_amount", "defaulting_description")}),
+    )
 
     def get_tenant_name(self, obj):
         return " ".join([obj.tenant.first_name, obj.tenant.last_name])
@@ -152,18 +181,58 @@ class BillsAdmin(admin.ModelAdmin):
         "name",
         "amount",
         "billing_cycle",
-        "date_paid",
+        "transaction_date",
         "transaction_reference",
         "due_date",
         "payment_status",
     )
     list_filter = ("payment_status",)
     search_fields = ["tenant__first_name", "tenant__last_name"]
+    readonly_fields = (
+        "transaction_date",
+        "bank",
+        "card_type",
+        "is_mobile",
+        "last4",
+        "card_expiry_month",
+        "card_expiry_year",
+        "card_brand",
+        "transaction_time",
+        "transaction_id",
+        "transaction_reference",
+    )
+
+    fieldsets = (
+        ("Basic", {"fields": ("tenant", "name", "amount", "description")}),
+        (
+            "Bill",
+            {"fields": ("due_date", "payment_status", "billing_cycle", "transaction_date", "transaction_reference")},
+        ),
+        (
+            "Other",
+            {
+                "fields": (
+                    "is_mobile",
+                    "bank",
+                    "card_type",
+                    "last4",
+                    "card_expiry_month",
+                    "card_expiry_year",
+                    "card_brand",
+                    "transaction_time",
+                    "transaction_id",
+                )
+            },
+        ),
+    )
 
     def get_tenant_name(self, obj):
         return " ".join([obj.tenant.first_name, obj.tenant.last_name])
 
     get_tenant_name.short_description = "Tenant Name"
+
+    class Media:
+        css = {"all": ("css/user_admin.css",)}
 
 
 class PaymentScheduleAdmin(admin.ModelAdmin):
@@ -181,7 +250,7 @@ class PaymentScheduleAdmin(admin.ModelAdmin):
 
 class AdminUserForm(ModelForm):
     class Meta:
-        model = models.User
+        model = core_models.User
         fields = ("first_name", "last_name", "email", "is_active", "is_superuser")
 
 
@@ -194,7 +263,7 @@ class TenantCommentAdmin(admin.ModelAdmin):
 
 
 class TenantCommentInline(admin.TabularInline):
-    model = models.TenantComment
+    model = core_models.TenantComment
     extra = 0
     classes = ["collapse"]
 
@@ -204,9 +273,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ("get_tenant_name", "email", "is_active")
     search_fields = ["first_name", "last_name", "email"]
     list_filter = ("is_active",)
-    # form = AdminUserForm
     fieldsets = (
-
         ("Registration", {"fields": ("first_name", "last_name", "email", "is_active", "is_superuser")}),
         (
             "Bio",
@@ -221,9 +288,9 @@ class UserAdmin(admin.ModelAdmin):
                     "date_of_birth",
                     "id_number",
                     "mobile_number",
-                    "whatsapp_number"
+                    "whatsapp_number",
                 )
-            }
+            },
         ),
         (
             "Previous Address",
@@ -302,6 +369,14 @@ class UserAdmin(admin.ModelAdmin):
     def get_tenant_name(self, obj):
         return " ".join([obj.first_name, obj.last_name])
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(UserAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields["gender"].widget.attrs["style"] = "width: 5em;"
+        return form
+
+    class Media:
+        css = {"all": ("css/user_admin.css",)}
+
     def change_view(self, request, object_id, form_url="", extra_context=None):
         """
         Change view allows you pass in extra context to an admin template
@@ -312,7 +387,7 @@ class UserAdmin(admin.ModelAdmin):
         :return:
         """
         extra_context = extra_context or {}
-        tenant_comments = models.TenantComment.objects.filter(tenant_id=object_id)
+        tenant_comments = core_models.TenantComment.objects.filter(tenant_id=object_id)
         extra_context["tenant_comments"] = tenant_comments
         extra_context["user"] = request.user
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
@@ -320,17 +395,17 @@ class UserAdmin(admin.ModelAdmin):
     get_tenant_name.short_description = "First Name/Last Name"
 
 
-admin.site.register(models.User, UserAdmin)
-admin.site.register(models.Property, PropertyAdmin)
-admin.site.register(models.PropertyImage, PropertyImageAdmin)
-admin.site.register(models.TenantDocument, TenantDocumentAdmin)
-admin.site.register(models.Letting, LettingAdmin)
-admin.site.register(models.PaymentSchedule, PaymentScheduleAdmin)
-admin.site.register(models.PropertyDocument)
-admin.site.register(models.PropertyRunningCosts)
-admin.site.register(models.TenantComment, TenantCommentAdmin)
-admin.site.register(models.Bills, BillsAdmin)
-admin.site.register(models.PropertyInventory, PropertyInventoryAdmin)
+admin.site.register(core_models.User, UserAdmin)
+admin.site.register(core_models.Property, PropertyAdmin)
+admin.site.register(core_models.PropertyImage, PropertyImageAdmin)
+admin.site.register(core_models.TenantDocument, TenantDocumentAdmin)
+admin.site.register(core_models.Letting, LettingAdmin)
+admin.site.register(core_models.PaymentSchedule, PaymentScheduleAdmin)
+admin.site.register(core_models.PropertyDocument)
+admin.site.register(core_models.PropertyRunningCosts, PropertyRunningCostAdmin)
+admin.site.register(core_models.TenantComment, TenantCommentAdmin)
+admin.site.register(core_models.Bills, BillsAdmin)
+admin.site.register(core_models.PropertyInventory, PropertyInventoryAdmin)
 
 admin.site.site_header = "Pyale Properties"
 admin.site.site_title = "Pyale Properties"

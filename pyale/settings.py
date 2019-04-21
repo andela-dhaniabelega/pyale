@@ -16,6 +16,8 @@ import cloudinary
 import django_heroku
 from dotenv import load_dotenv
 
+from celery.schedules import crontab
+
 load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -160,6 +162,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+USE_THOUSAND_SEPARATOR = True
+
 DEFAULT_CURRENCY = "NGN"
 CURRENCIES = ('NGN',)
 MAX_RENT_MONTHS = 60
@@ -191,6 +195,17 @@ OLD_PASSWORD_FIELD_ENABLED = True
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'core.api.serializers.UserDetailsSerializer',
     'LOGIN_SERIALIZER': 'core.api.serializers.LoginSerializer'
+}
+
+# CELERY SETTINGS
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_TIMEZONE = 'Africa/Lagos'
+CELERY_IMPORTS = ("core.tasks", )
+CELERY_BEAT_SCHEDULE = {
+    'send-notification-everyday-at-6pm': {
+        'task': 'Send Rent Expiry Reminder',
+        'schedule': crontab(minute=0, hour=18),
+    },
 }
 
 # EMAIL SETTINGS

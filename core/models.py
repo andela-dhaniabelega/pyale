@@ -50,6 +50,15 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    GENDER_CHOICES = (("male", "Male"), ("female", "Female"))
+    EMPLOYMENT_CHOICES = (("employed", "Employed"), ("unemployed", "Unemployed"), ("self_employed", "Self Employed"))
+    TITLE = (("mr", "Mr"), ("mrs", "Mrs"), ("ms", "Ms"), ("dr", "Dr"))
+    RELATIONSHIP_TO_TENANT = (
+        ("father", "Father"),
+        ("mother", "Mother"),
+        ("sibling", "Sibling"),
+        ("relative", "Relative"),
+    )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
@@ -62,13 +71,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     temp_password_expiry = models.DateTimeField(null=True, blank=True)
     temp_password = models.CharField(max_length=50, null=True, blank=True)
     is_previously_logged_in = models.BooleanField(default=False, blank=True)
-    title = models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(max_length=50, blank=True, null=True, choices=TITLE)
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     maiden_name = models.CharField(max_length=255, blank=True, null=True)
     nationality = models.CharField(max_length=255, blank=True, null=True)
-    gender = models.CharField(max_length=255, blank=True, null=True)
+    gender = models.CharField(max_length=255, blank=True, null=True, choices=GENDER_CHOICES)
     telephone = models.CharField(max_length=255, blank=True, null=True)
-    date_of_birth = models.CharField(max_length=255, blank=True, null=True)
+    date_of_birth = models.DateField(max_length=255, blank=True, null=True)
     id_number = models.CharField(max_length=255, blank=True, null=True)
     mobile_number = models.CharField(max_length=255, blank=True, null=True)
     whatsapp_number = models.CharField(max_length=255, blank=True, null=True)
@@ -81,7 +90,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     previous_address_duration_of_stay = models.CharField(
         max_length=50, blank=True, null=True, verbose_name="Duration of Stay"
     )
-    employment_status = models.CharField(max_length=50, blank=True, null=True)
+    employment_status = models.CharField(max_length=50, blank=True, null=True, choices=EMPLOYMENT_CHOICES)
     job_title = models.CharField(max_length=255, blank=True, null=True)
     years_at_current_employment = models.CharField(max_length=50, blank=True, null=True)
     employer_name = models.CharField(max_length=255, blank=True, null=True)
@@ -119,7 +128,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def __str__(self):
         return " ".join([self.first_name, self.last_name])
@@ -141,6 +150,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
         if self.email and not re.match(email_pattern, self.email):
             raise ValidationError("Invalid Email")
+        if self.referee_email and not re.match(email_pattern, self.referee_email):
+            raise ValidationError("Invalid Referee Email")
+        if self.next_of_kin_email and not re.match(email_pattern, self.next_of_kin_email):
+            raise ValidationError("Invalid Next of Kin Email")
+        if self.employer_email and not re.match(email_pattern, self.employer_email):
+            raise ValidationError("Invalid Employer Email")
+        if self.referee_email and not re.match(email_pattern, self.referee_email):
+            raise ValidationError("Invalid Referee Email")
 
     def save(self, *args, **kwargs):
         if self._state.adding and not self.is_superuser:
@@ -285,7 +302,7 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
         if hasattr(self.image, "file"):
             if self.image.content_type not in ALLOWED_IMAGE_TYPES:
                 raise ValidationError({"image": "Unsupported Image Format. Supported: .jpg, .jpeg, .png, .gif, .svg"})
-            if self.image.size > 1_000_000:
+            if self.image.size > 10_000_000:
                 raise ValidationError({"image": "Maximum Image size is 10MB"})
 
     def delete(self, using=None, keep_parents=False):
@@ -419,7 +436,7 @@ class Letting(DirtyFieldsMixin, models.Model):
         default_currency=settings.DEFAULT_CURRENCY,
         help_text="Deposit for this letting (in Naira)",
     )
-    deposit_refunded = models.BooleanField(null=True, blank=True)
+    deposit_refunded = models.BooleanField(null=True, blank=True, default=False)
     deposit_refund_date = models.DateField(null=True, blank=True)
     cost = MoneyField(
         max_digits=19,
@@ -671,7 +688,7 @@ class PropertyRecords(models.Model):
 
 class Bills(models.Model):
     tenant = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, help_text="A title for this bill")
     amount = MoneyField(
         max_digits=19,
         decimal_places=2,
@@ -680,14 +697,31 @@ class Bills(models.Model):
     )
     payment_status = models.BooleanField(default=False)
     description = models.TextField()
-    billing_cycle = models.CharField(max_length=255)
-    date_paid = models.CharField(max_length=255, blank=True, null=True)
-    transaction_reference = models.CharField(max_length=255, blank=True, null=True)
+    billing_cycle = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Automatically Populated for Service Charge. Might not be required for other bills",
+    )
+    transaction_date = models.CharField(max_length=255, blank=True, null=True, editable=False)
+    transaction_reference = models.CharField(max_length=255, blank=True, null=True, editable=False)
     due_date = models.DateField(blank=True, null=True)
+    is_mobile = models.BooleanField(blank=True, null=True, editable=False)
+    bank = models.CharField(max_length=255, blank=True, null=True, editable=False)
+    card_type = models.CharField(max_length=150, blank=True, null=True, editable=False)
+    last4 = models.CharField(max_length=50, blank=True, null=True, editable=False)
+    card_expiry_month = models.CharField(max_length=50, blank=True, null=True, editable=False)
+    card_expiry_year = models.CharField(max_length=150, blank=True, null=True, editable=False)
+    card_brand = models.CharField(max_length=50, blank=True, null=True, editable=False)
+    transaction_time = models.CharField(max_length=50, blank=True, null=True, editable=False)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True, editable=False)
 
     class Meta:
         verbose_name = "Bills"
         verbose_name_plural = "Bills"
+
+    def __str__(self):
+        return " ".join([self.tenant.first_name, self.tenant.last_name])
 
 
 # Signals

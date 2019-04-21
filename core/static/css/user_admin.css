@@ -1,0 +1,15 @@
+input[type=text] {
+    width: 50% !important;
+}
+
+#id_title, #id_gender, #id_date_of_birth {
+    width: 10% !important;
+}
+
+#id_date_of_birth {
+    width: 15% !important;
+}
+
+#id_email {
+    width: 50%;
+}

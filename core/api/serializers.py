@@ -242,7 +242,19 @@ class EmailChangeSerializer(serializers.ModelSerializer):
 
 
 class TenantBillsUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Bills
-        fields = ("payment_status", "date_paid")
+        fields = (
+            "payment_status",
+            "transaction_date",
+            "transaction_reference",
+            "is_mobile",
+            "bank",
+            "card_type",
+            "last4",
+            "card_expiry_month",
+            "card_expiry_year",
+            "card_brand",
+            "transaction_time",
+            "transaction_id",
+        )
