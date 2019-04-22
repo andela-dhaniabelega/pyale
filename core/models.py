@@ -287,7 +287,12 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
             self.image = new_image["url"]
         else:
             modified_fields = self.get_dirty_fields()
-            if "image" in modified_fields:
+
+            # The check: isinstance(self.image, cloudinary.CloudinaryResource) is a temporary workaround to check if
+            # there's a true attempt to upload a new image. It appears self.image is always considered as a dirty
+            # field even if it's not modified. If isinstance(self.image, cloudinary.CloudinaryResource) returns true
+            # then we know that the image field was not modified.
+            if "image" in modified_fields and not isinstance(self.image, cloudinary.CloudinaryResource):
                 # Remove existing image from Cloudinary
                 public_id = get_public_id_from_url(self._original_state["image"].url)
                 cloudinary.uploader.destroy(public_id)
