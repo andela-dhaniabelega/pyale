@@ -16,8 +16,6 @@ import cloudinary
 import django_heroku
 from dotenv import load_dotenv
 
-from celery.schedules import crontab
-
 load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -197,16 +195,6 @@ REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'core.api.serializers.LoginSerializer'
 }
 
-# CELERY SETTINGS
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_TIMEZONE = 'Africa/Lagos'
-CELERY_IMPORTS = ("core.tasks", )
-CELERY_BEAT_SCHEDULE = {
-    'send-notification-everyday-at-6pm': {
-        'task': 'Send Rent Expiry Reminder',
-        'schedule': crontab(minute=0, hour=18),
-    },
-}
 
 # EMAIL SETTINGS
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
