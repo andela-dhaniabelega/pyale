@@ -212,6 +212,8 @@ class Property(models.Model):
     specs = ArrayField(models.CharField(max_length=512))
     name = models.CharField(unique=True, max_length=512)
     location = models.CharField(blank=True, null=True, max_length=100, choices=PROPERTY_LOCATIONS)
+    active = models.BooleanField(default=True)
+    home_page = models.BooleanField(default=False, help_text="If checked, property will be displayed on homepage")
 
     def __str__(self):
         return self.name

@@ -144,6 +144,8 @@ class PropertySerializer(serializers.ModelSerializer):
             "name",
             "location",
             "property_images",
+            "active",
+            "home_page"
         )
 
 
