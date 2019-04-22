@@ -223,7 +223,7 @@ class Property(models.Model):
 
         if self.rental_revenue and self.id:
             running_cost = [
-                running_cost.amount for running_cost in PropertyRunningCosts.objects.filter(realty_id=self.id)
+                running_cost.amount_spent for running_cost in PropertyRunningCosts.objects.filter(realty_id=self.id)
             ]
             running_cost = sum(running_cost)
             self.net_revenue = self.rental_revenue.amount - running_cost
