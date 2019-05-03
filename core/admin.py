@@ -1,7 +1,10 @@
+import modelclone
+import pendulum
 from django.urls import reverse
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as lazy
 from django.utils.safestring import mark_safe
-from django.forms import ModelForm, Textarea, TextInput
+from django.forms import ModelForm, Textarea
 from django.db import models
 from core import models as core_models
 
@@ -129,7 +132,8 @@ class TenantDocumentAdmin(admin.ModelAdmin):
     get_tenant_name.admin_order_field = "tenant"
 
 
-class LettingAdmin(admin.ModelAdmin):
+class LettingAdmin(modelclone.ClonableModelAdmin):
+    clone_verbose_name = lazy('Renew Letting')
     inlines = [PaymentScheduleInline]
     list_display = (
         "get_tenant_name",
@@ -141,7 +145,9 @@ class LettingAdmin(admin.ModelAdmin):
         "amount_outstanding",
         "cost",
         "schedule_type",
+        "active"
     )
+    list_filter = ('active',)
     search_fields = ["tenant__first_name", "tenant__last_name"]
     fieldsets = (
         (
@@ -156,6 +162,7 @@ class LettingAdmin(admin.ModelAdmin):
                     "cost",
                     "schedule_type",
                     "service_charge",
+                    "active"
                 )
             },
         ),
@@ -169,6 +176,13 @@ class LettingAdmin(admin.ModelAdmin):
     def letting_duration(self, instance):
         if instance.duration:
             return f"{instance.duration} month(s)"
+
+    def tweak_cloned_fields(self, fields):
+        instance = core_models.Letting.objects.get(id=fields['id'])
+        end_date = instance.end_date
+        fields['start_date'] = pendulum.date(end_date.year, end_date.month, end_date.day).add(days=1)
+
+        return fields
 
     get_tenant_name.short_description = "Tenant Name"
     get_tenant_name.admin_order_field = "tenant"

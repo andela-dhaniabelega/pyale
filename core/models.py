@@ -21,7 +21,7 @@ from djmoney.models.fields import MoneyField
 from core.constants import LOCAL_HOST
 from core.utils import get_public_id_from_url, get_cycles_from_date_range, generate_random_string
 from pyale import settings
-from pyale.settings import EMAIL_HOST_USER
+from pyale.settings import AUTOMATED_EMAIL_ADDRESS
 
 logger = logging.getLogger(__name__)
 ALLOWED_CONTENT_TYPES = ("application/pdf",)
@@ -445,6 +445,7 @@ class Letting(DirtyFieldsMixin, models.Model):
     )
     deposit_refunded = models.BooleanField(null=True, blank=True, default=False)
     deposit_refund_date = models.DateField(null=True, blank=True)
+    active = models.BooleanField(default=True)
     cost = MoneyField(
         max_digits=19,
         decimal_places=2,
@@ -827,7 +828,7 @@ def send_registration_email(sender, **kwargs):
         send_mail(
             subject=subject,
             message=plain_message,
-            from_email=EMAIL_HOST_USER,
+            from_email=AUTOMATED_EMAIL_ADDRESS,
             recipient_list=[instance.email],
             html_message=message,
         )
@@ -862,7 +863,7 @@ def password_reset_token_created(sender, reset_password_token, *args, **kwargs):
         # message:
         email_plaintext_message,
         # from:
-        EMAIL_HOST_USER,
+        AUTOMATED_EMAIL_ADDRESS,
         # to:
         [reset_password_token.user.email],
     )
