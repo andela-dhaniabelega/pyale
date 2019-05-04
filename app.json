@@ -1,7 +1,6 @@
 {
   "name": "pyale",
   "scripts": {
-    "postdeploy": "pg_dump $DATABASE_URL | psql $DATABASE_URL && python ./manage.py migrate --fake auth && python ./manage.py migrate core"
   },
   "env": {
     "DATABASE_URL": {
