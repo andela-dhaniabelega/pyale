@@ -1,0 +1,14 @@
+Dear Admin
+
+The tenancy listed below will expire in two weeks.
+
+Tenant Name: {{ tenant_name }}
+Tenant Email: {{ email }}
+Property Name: {{ letting_name }}
+End Date: &nbsp; {{ end_date }}
+
+Please remember that you are expected to contact this tenant in the next couple of days to discuss their tenancy
+options.
+
+Please do not reply to this mail as this is an unmonitored mailbox
+

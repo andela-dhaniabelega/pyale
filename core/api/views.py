@@ -1,6 +1,7 @@
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, permissions
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from core.api import serializers
@@ -65,19 +66,14 @@ class TenantBillsList(generics.ListAPIView):
         return models.Bills.objects.filter(tenant__id=pk)
 
 
-class TenantBillsUpdate(APIView):
+class TenantBillsUpdate(generics.UpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = serializers.TenantBillsUpdateSerializer
 
-    def get_object(self, pk):
-        return models.Bills.objects.get(id=pk)
-
-    def patch(self, request, pk):
-        instance = self.get_object(pk)
-        serializer = serializers.TenantBillsUpdateSerializer(instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        bill_id = self.kwargs.get("pk")
+        queryset = models.Bills.objects.filter(id=bill_id)
+        return queryset
 
 
 class EmailChange(generics.UpdateAPIView):

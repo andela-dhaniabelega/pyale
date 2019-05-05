@@ -1,0 +1,14 @@
+Dear {{ tenant_name | linebreaksbr }}
+
+We would like to inform you that your letting at {{ property_name }} will expire on {{ end_date }}.
+
+We hope you have enjoyed your tenancy. A support staff will be reaching out to you in the
+next couple of days to discuss your tenancy options.
+
+Please do not hesitate to contact us if you have any questions. You can contact us via your tenant portal or
+send us an email directly to support@pyaleproperties.com. You can also call us at +234 818 817 5030.
+
+Thank you for your patronage.
+
+
+Please do not reply to this mail as this is an unmonitored mailbox

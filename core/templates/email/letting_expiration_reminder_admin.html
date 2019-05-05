@@ -1,0 +1,19 @@
+{% autoescape off %}
+
+    Dear Admin<br/><br/>
+
+    The tenancy listed below will expire in two weeks. <br/> <br/>
+
+    Tenant Name: &nbsp; {{ tenant_name }}
+    Tenant Email: &nbsp; {{ email }}
+    Property Name: &nbsp; {{ letting_name }}
+    End Date: &nbsp; {{ end_date }}
+
+    Please remember that you are expected to contact this tenant in the next couple of days to discuss their tenancy
+    options.
+
+    <br/><br/>
+
+    <span style="color: #999999">Please do not reply to this mail as this is an unmonitored mailbox</span>
+
+{% endautoescape %}

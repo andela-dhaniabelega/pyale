@@ -59,7 +59,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_rest_passwordreset',
     'core',
-    'djmoney'
+    'djmoney',
+    'django_celery_beat',
+    'modelclone'
 ]
 
 MIDDLEWARE = [
@@ -173,7 +175,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-
 # Cloudinary Configuration
 
 cloudinary.config(
@@ -186,6 +187,10 @@ SUIT_CONFIG = {
     'ADMIN_NAME': 'Pyale Properties'
 }
 
+# CELERY SETTINGS
+CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+CELERY_TIMEZONE = os.environ.get('TIMEZONE')
+
 # REST AUTH SETTINGS
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
@@ -194,7 +199,6 @@ REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'core.api.serializers.UserDetailsSerializer',
     'LOGIN_SERIALIZER': 'core.api.serializers.LoginSerializer'
 }
-
 
 # EMAIL SETTINGS
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -210,6 +214,7 @@ EMAIL_HOST_USER = os.environ.get('SEND_GRID_EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('SEND_GRID_EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+AUTOMATED_EMAIL_ADDRESS = os.environ.get('AUTOMATED_EMAIL_ADDRESS')
 
 # Static config
 
