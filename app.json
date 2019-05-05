@@ -1,6 +1,7 @@
 {
   "name": "pyale",
   "scripts": {
+    "postdeploy": "pg_dump $DATABASE_URL | psql $DATABASE_URL && python ./manage.py migrate"
   },
   "env": {
     "DATABASE_URL": {
