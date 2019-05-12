@@ -21,7 +21,7 @@ from djmoney.models.fields import MoneyField
 from core.constants import LOCAL_HOST
 from core.utils import get_public_id_from_url, get_cycles_from_date_range, generate_random_string
 from pyale import settings
-from pyale.settings import AUTOMATED_EMAIL_ADDRESS
+from pyale.settings import AUTOMATED_EMAIL_ADDRESS, MAX_UPLOAD_FILE_SIZE
 
 logger = logging.getLogger(__name__)
 ALLOWED_CONTENT_TYPES = ("application/pdf",)
@@ -209,7 +209,7 @@ class Property(models.Model):
         help_text="Net Revenue of Property in Naira for current year",
     )
     description = models.TextField()
-    specs = ArrayField(models.CharField(max_length=512))
+    summary = models.TextField(max_length=180)
     name = models.CharField(unique=True, max_length=512)
     location = models.CharField(blank=True, null=True, max_length=100, choices=PROPERTY_LOCATIONS)
     active = models.BooleanField(default=True)
@@ -271,46 +271,36 @@ class PropertyRunningCosts(models.Model):
 
 
 class PropertyImage(DirtyFieldsMixin, models.Model):
+    IMAGE_TAGS = (("thumbnail", "Thumbnail"), ("gallery", "Gallery"))
     realty = models.ForeignKey(
         Property, on_delete=models.CASCADE, related_name="property_images", verbose_name="Property"
     )
-    image = CloudinaryField("image")
-    image_details = JSONField(max_length=255, null=True, blank=True)
-    tag = models.CharField(max_length=255, help_text="A tag name for this image")
+    image = models.FileField(blank=True, null=True)
+    tag = models.CharField(
+        max_length=255,
+        help_text="A tag name for this image. A 'thumbnail' tag means the image is displayed with the property summary."
+        "A 'gallery' tag means the image is displayed in the property gallery. "
+        "NOTE: YOU CAN ONLY HAVE ONE THUMBNAIL IMAGE PER PROPERTY",
+        choices=IMAGE_TAGS,
+    )
 
     def __str__(self):
         return self.tag
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean()
-        if self._state.adding:
-            new_image = cloudinary.uploader.upload(self.image, use_filename=True, folder="property_images/")
-            self.image_details = new_image
-            self.image = new_image["url"]
-        else:
-            modified_fields = self.get_dirty_fields()
-
-            # The check: isinstance(self.image, cloudinary.CloudinaryResource) is a temporary workaround to check if
-            # there's a true attempt to upload a new image. It appears self.image is always considered as a dirty
-            # field even if it's not modified. If isinstance(self.image, cloudinary.CloudinaryResource) returns true
-            # then we know that the image field was not modified.
-            if "image" in modified_fields and not isinstance(self.image, cloudinary.CloudinaryResource):
-                # Remove existing image from Cloudinary
-                public_id = get_public_id_from_url(self._original_state["image"].url)
-                cloudinary.uploader.destroy(public_id)
-
-                # Save new Image
-                new_image = cloudinary.uploader.upload(self.image)
-                self.image_details = new_image
-                self.image = new_image["url"]
         super().save()
 
     def clean(self):
-        if hasattr(self.image, "file"):
-            if self.image.content_type not in ALLOWED_IMAGE_TYPES:
-                raise ValidationError({"image": "Unsupported Image Format. Supported: .jpg, .jpeg, .png, .gif, .svg"})
-            if self.image.size > 10_000_000:
-                raise ValidationError({"image": "Maximum Image size is 10MB"})
+        if self.image._file and hasattr(self.image, "file"):
+            if self.image.file.content_type not in ALLOWED_IMAGE_TYPES:
+                raise ValidationError({"image": "Unsupported Image Format. Supported: .jpg, .jpeg, .png, .gif"})
+            if self.image.size > MAX_UPLOAD_FILE_SIZE:
+                raise ValidationError({"image": "Maximum Image size is 5MB"})
+
+        current_tags = self.realty.property_images.values_list("tag", flat=True)
+        if "thumbnail" in current_tags and self.tag == 'thumbnail':
+            raise ValidationError({"tag": "A thumbnail image already exists."})
 
     def delete(self, using=None, keep_parents=False):
         public_id = get_public_id_from_url(self.image.url)
@@ -324,7 +314,7 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
 
 class PropertyDocument(DirtyFieldsMixin, models.Model):
     realty = models.ForeignKey(Property, on_delete=models.CASCADE, verbose_name="Property")
-    document = CloudinaryField()
+    document = models.FileField(help_text="File must be in PDF format")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     name = models.CharField(unique=True, max_length=255)
@@ -334,27 +324,14 @@ class PropertyDocument(DirtyFieldsMixin, models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean()
-        if self._state.adding:
-            new_document = cloudinary.uploader.upload(self.document, use_filename=True, folder="property_documents/")
-            self.document = new_document["url"]
-        else:
-            modified_fields = self.get_dirty_fields()
-            if "document" in modified_fields:
-                # Remove existing image from Cloudinary
-                original_document = self._original_state["document"]
-                public_id = get_public_id_from_url(original_document.url)
-                cloudinary.uploader.destroy(f"{public_id}.{original_document.format}", resource_type="raw")
-
-                # Save new Document
-                new_document = cloudinary.uploader.upload(self.document, resource_type="raw")
-                self.document = new_document["url"]
         super().save()
 
     def clean(self):
-        if self.document.content_type not in ALLOWED_CONTENT_TYPES:
-            raise ValidationError({"document": "Only PDF documents are allowed at this time"})
-        if self.document.size > 1_000_000:
-            raise ValidationError({"document": "Maximum file size allowed is 10MB"})
+        if self.document._file and hasattr(self.document, "file"):
+            if self.document.file.content_type not in ALLOWED_CONTENT_TYPES:
+                raise ValidationError({"document": "Only PDF documents are allowed at this time"})
+            if self.document.size > MAX_UPLOAD_FILE_SIZE:
+                raise ValidationError({"document": "Maximum file size allowed is 5MB"})
 
     class Meta:
         verbose_name = "Property Document"
@@ -363,7 +340,7 @@ class PropertyDocument(DirtyFieldsMixin, models.Model):
 
 class TenantDocument(DirtyFieldsMixin, models.Model):
     tenant = models.ForeignKey(User, on_delete=models.CASCADE)
-    document = CloudinaryField()
+    document = models.FileField(help_text="File must be in PDF format")
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     name = models.CharField(unique=True, max_length=255)
@@ -374,32 +351,14 @@ class TenantDocument(DirtyFieldsMixin, models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean()
-        if self._state.adding:
-            new_document = cloudinary.uploader.upload(self.document, use_filename=True, folder="tenant_documents/")
-            self.document = new_document["url"]
-        else:
-            modified_fields = self.get_dirty_fields()
-            if "document" in modified_fields:
-                # Remove existing image from Cloudinary
-                original_document = self._original_state["document"]
-                public_id = get_public_id_from_url(original_document.url)
-                cloudinary.uploader.destroy(f"{public_id}.{original_document.format}", resource_type="raw")
-
-                # Save new Document
-                new_document = cloudinary.uploader.upload(self.document, resource_type="raw")
-                self.document = f"{new_document['url']}.{new_document.format}"
         super().save()
 
     def clean(self):
-        if self.document.content_type not in ALLOWED_CONTENT_TYPES:
-            raise ValidationError({"document": "Only PDF documents are allowed at this time"})
-        if self.document.size > 1_000_000:
-            raise ValidationError({"document": "Maximum file size allowed is 10MB"})
-
-    def delete(self, using=None, keep_parents=False):
-        public_id = get_public_id_from_url(self.document.url)
-        cloudinary.uploader.destroy(f"{public_id}.{self.document.format}", resource_type="raw")
-        super().delete()
+        if self.document._file and hasattr(self.document, "file"):
+            if self.document.file.content_type not in ALLOWED_CONTENT_TYPES:
+                raise ValidationError({"document": "Only PDF documents are allowed at this time"})
+            if self.document.size > MAX_UPLOAD_FILE_SIZE:
+                raise ValidationError({"document": "Maximum file size allowed is 5MB"})
 
     class Meta:
         verbose_name = "Tenant Document"

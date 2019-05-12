@@ -61,7 +61,9 @@ INSTALLED_APPS = [
     'core',
     'djmoney',
     'django_celery_beat',
-    'modelclone'
+    'modelclone',
+    'storages',
+    'django_summernote'
 ]
 
 MIDDLEWARE = [
@@ -171,12 +173,35 @@ MAX_RENT_MONTHS = 60
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+USE_S3 = os.environ.get('USE_S3') == 'TRUE'
+
+if USE_S3:
+    # aws settings
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    # s3 static settings
+    AWS_LOCATION = 'static'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+else:
+    STATIC_URL = '/staticfiles/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+MEDIA_URL = '/mediafiles/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+DEFAULT_FILE_STORAGE = 'pyale.storage_backends.MediaStorage'
 
 # Cloudinary Configuration
-
 cloudinary.config(
     cloud_name=os.getenv("PYALE_CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("PYALE_CLOUDINARY_API_KEY"),
@@ -215,6 +240,8 @@ EMAIL_HOST_PASSWORD = os.environ.get('SEND_GRID_EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 AUTOMATED_EMAIL_ADDRESS = os.environ.get('AUTOMATED_EMAIL_ADDRESS')
+
+MAX_UPLOAD_FILE_SIZE = 5242880
 
 # Static config
 

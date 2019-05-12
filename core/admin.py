@@ -6,6 +6,8 @@ from django.utils.translation import ugettext_lazy as lazy
 from django.utils.safestring import mark_safe
 from django.forms import ModelForm, Textarea
 from django.db import models
+from django_summernote.admin import SummernoteModelAdmin
+
 from core import models as core_models
 
 
@@ -22,7 +24,8 @@ class PropertyInventoryInline(admin.TabularInline):
     verbose_name = "Property Inventory"
 
 
-class PropertyAdmin(admin.ModelAdmin):
+class PropertyAdmin(SummernoteModelAdmin):
+    summernote_fields = ('description',)
     inlines = [PropertyImageInline, PropertyInventoryInline]
     list_display = (
         "name",
@@ -35,6 +38,20 @@ class PropertyAdmin(admin.ModelAdmin):
     )
     search_fields = ["category"]
     list_filter = ("category",)
+    fieldsets = (
+        (
+            "Valuation",
+            {
+                "fields": (
+                    "property_value",
+                    "current_rental_value",
+                    "rental_revenue",
+                    "net_revenue",
+                )
+            },
+        ),
+        ("Property Info", {"fields": ("category", "name", "summary", "description", "location", "active", "home_page")}),
+    )
 
 
 class PropertyInventoryAdmin(admin.ModelAdmin):
@@ -133,7 +150,7 @@ class TenantDocumentAdmin(admin.ModelAdmin):
 
 
 class LettingAdmin(modelclone.ClonableModelAdmin):
-    clone_verbose_name = lazy('Renew Letting')
+    clone_verbose_name = lazy("Renew Letting")
     inlines = [PaymentScheduleInline]
     list_display = (
         "get_tenant_name",
@@ -145,9 +162,9 @@ class LettingAdmin(modelclone.ClonableModelAdmin):
         "amount_outstanding",
         "cost",
         "schedule_type",
-        "active"
+        "active",
     )
-    list_filter = ('active',)
+    list_filter = ("active",)
     search_fields = ["tenant__first_name", "tenant__last_name"]
     fieldsets = (
         (
@@ -162,7 +179,7 @@ class LettingAdmin(modelclone.ClonableModelAdmin):
                     "cost",
                     "schedule_type",
                     "service_charge",
-                    "active"
+                    "active",
                 )
             },
         ),
@@ -178,9 +195,9 @@ class LettingAdmin(modelclone.ClonableModelAdmin):
             return f"{instance.duration} month(s)"
 
     def tweak_cloned_fields(self, fields):
-        instance = core_models.Letting.objects.get(id=fields['id'])
+        instance = core_models.Letting.objects.get(id=fields["id"])
         end_date = instance.end_date
-        fields['start_date'] = pendulum.date(end_date.year, end_date.month, end_date.day).add(days=1)
+        fields["start_date"] = pendulum.date(end_date.year, end_date.month, end_date.day).add(days=1)
 
         return fields
 

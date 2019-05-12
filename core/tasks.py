@@ -11,14 +11,12 @@ from pyale.settings import AUTOMATED_EMAIL_ADDRESS
 log = logging.getLogger(__name__)
 
 
-@task(name='reminder')
+@task(name="reminder")
 def send_end_of_letting_reminder():
     log.info("Sending email")
     for letting in models.Letting.objects.all():
         letting_end_date = pendulum.date(
-            year=letting.end_date.year,
-            month=letting.end_date.month,
-            day=letting.end_date.day
+            year=letting.end_date.year, month=letting.end_date.month, day=letting.end_date.day
         )
         if letting_end_date.diff().in_weeks() == 2:
             tenant_email = letting.tenant.email
@@ -30,11 +28,7 @@ def send_end_of_letting_reminder():
 
 # TODO: Create a util for sending email to avoid repetitive code. This util will also be used in models.py
 def send_email_to_tenant(email, tenant_name, property_name, end_date):
-    context = {
-        "tenant_name": tenant_name,
-        "property_name": property_name,
-        "end_date": end_date
-    }
+    context = {"tenant_name": tenant_name, "property_name": property_name, "end_date": end_date}
 
     # render email text
     email_html_message = render_to_string("email/letting_expiration_reminder.html", context)
@@ -55,12 +49,7 @@ def send_email_to_tenant(email, tenant_name, property_name, end_date):
 
 
 def send_email_to_admin(tenant_name, email, property_name, end_date):
-    context = {
-        "tenant_name": tenant_name,
-        "email": email,
-        "property_name": property_name,
-        "end_date": end_date
-    }
+    context = {"tenant_name": tenant_name, "email": email, "property_name": property_name, "end_date": end_date}
 
     # render email text
     email_html_message = render_to_string("email/letting_expiration_reminder_admin.html", context)

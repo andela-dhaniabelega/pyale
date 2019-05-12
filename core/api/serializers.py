@@ -140,12 +140,12 @@ class PropertySerializer(serializers.ModelSerializer):
             "category",
             "current_rental_value",
             "description",
-            "specs",
+            "summary",
             "name",
             "location",
             "property_images",
             "active",
-            "home_page"
+            "home_page",
         )
 
 
