@@ -2,11 +2,15 @@ import modelclone
 import pendulum
 from django.urls import reverse
 from django.contrib import admin
+from django.contrib.auth.models import Group
+from django_rest_passwordreset.models import ResetPasswordToken
 from django.utils.translation import ugettext_lazy as lazy
 from django.utils.safestring import mark_safe
 from django.forms import ModelForm, Textarea
 from django.db import models
 from django_summernote.admin import SummernoteModelAdmin
+from django_summernote.models import Attachment
+from rest_framework.authtoken.models import Token
 
 from core import models as core_models
 
@@ -437,6 +441,11 @@ admin.site.register(core_models.PropertyRunningCosts, PropertyRunningCostAdmin)
 admin.site.register(core_models.TenantComment, TenantCommentAdmin)
 admin.site.register(core_models.Bills, BillsAdmin)
 admin.site.register(core_models.PropertyInventory, PropertyInventoryAdmin)
+
+admin.site.unregister(ResetPasswordToken)
+admin.site.unregister(Group)
+admin.site.unregister(Attachment)
+admin.site.unregister(Token)
 
 admin.site.site_header = "Pyale Properties"
 admin.site.site_title = "Pyale Properties"
