@@ -8,8 +8,6 @@ from django.utils.translation import ugettext_lazy as lazy
 from django.utils.safestring import mark_safe
 from django.forms import ModelForm, Textarea
 from django.db import models
-from django_summernote.admin import SummernoteModelAdmin
-from django_summernote.models import Attachment
 from rest_framework.authtoken.models import Token
 
 from core import models as core_models
@@ -28,8 +26,7 @@ class PropertyInventoryInline(admin.TabularInline):
     verbose_name = "Property Inventory"
 
 
-class PropertyAdmin(SummernoteModelAdmin):
-    summernote_fields = ('description',)
+class PropertyAdmin(admin.ModelAdmin):
     inlines = [PropertyImageInline, PropertyInventoryInline]
     list_display = (
         "name",
@@ -43,18 +40,11 @@ class PropertyAdmin(SummernoteModelAdmin):
     search_fields = ["category"]
     list_filter = ("category",)
     fieldsets = (
+        ("Valuation", {"fields": ("property_value", "current_rental_value", "rental_revenue", "net_revenue")}),
         (
-            "Valuation",
-            {
-                "fields": (
-                    "property_value",
-                    "current_rental_value",
-                    "rental_revenue",
-                    "net_revenue",
-                )
-            },
+            "Property Info",
+            {"fields": ("category", "name", "summary", "description", "location", "active", "home_page")},
         ),
-        ("Property Info", {"fields": ("category", "name", "summary", "description", "location", "active", "home_page")}),
     )
 
 
@@ -444,7 +434,6 @@ admin.site.register(core_models.PropertyInventory, PropertyInventoryAdmin)
 
 admin.site.unregister(ResetPasswordToken)
 admin.site.unregister(Group)
-admin.site.unregister(Attachment)
 admin.site.unregister(Token)
 
 admin.site.site_header = "Pyale Properties"

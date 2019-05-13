@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django_rest_passwordreset.signals import reset_password_token_created
 from djmoney.models.fields import MoneyField
+from tinymce.models import HTMLField
 
 from core.constants import LOCAL_HOST
 from core.utils import get_public_id_from_url, get_cycles_from_date_range, generate_random_string
@@ -206,7 +207,7 @@ class Property(models.Model):
         default_currency=settings.DEFAULT_CURRENCY,
         help_text="Net Revenue of Property in Naira for current year",
     )
-    description = models.TextField()
+    description = HTMLField()
     summary = models.TextField(max_length=180, help_text="Maximum of 180 characters")
     name = models.CharField(unique=True, max_length=512)
     location = models.CharField(blank=True, null=True, max_length=100, choices=PROPERTY_LOCATIONS)
@@ -227,14 +228,6 @@ class Property(models.Model):
             self.net_revenue = self.rental_revenue.amount - running_cost.amount
 
         super().save()
-
-    def delete(self, using=None, keep_parents=False):
-        property_images = PropertyImage.objects.filter(realty_id=self.id)
-        if property_images is not None:
-            for property_image in property_images:
-                public_id = get_public_id_from_url(property_image.image.url)
-                cloudinary.uploader.destroy(public_id)
-        super().delete()
 
     class Meta:
         verbose_name = "Property"

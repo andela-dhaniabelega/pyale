@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'modelclone',
     'storages',
-    'django_summernote'
+    'tinymce'
 ]
 
 MIDDLEWARE = [
@@ -173,10 +173,6 @@ MAX_RENT_MONTHS = 60
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-# STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
 USE_S3 = os.environ.get('USE_S3') == 'TRUE'
 
 if USE_S3:
@@ -226,13 +222,6 @@ REST_AUTH_SERIALIZERS = {
 }
 
 # EMAIL SETTINGS
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'pyaleproperties@gmail.com'
-# EMAIL_HOST_PASSWORD = os.environ.get('PYALE_EMAIL_HOST_PASSWORD')
-
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = os.environ.get('SEND_GRID_EMAIL_HOST_USER')
@@ -242,8 +231,6 @@ EMAIL_USE_TLS = True
 AUTOMATED_EMAIL_ADDRESS = os.environ.get('AUTOMATED_EMAIL_ADDRESS')
 
 MAX_UPLOAD_FILE_SIZE = 5242880
-
-# Static config
 
 
 # Activate Django-Heroku.
