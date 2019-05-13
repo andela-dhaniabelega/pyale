@@ -8,10 +8,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.db import models
-from django.contrib.postgres.fields import ArrayField, JSONField
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from cloudinary.models import CloudinaryField
 import pendulum
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -209,7 +207,7 @@ class Property(models.Model):
         help_text="Net Revenue of Property in Naira for current year",
     )
     description = models.TextField()
-    summary = models.TextField(max_length=180)
+    summary = models.TextField(max_length=180, help_text="Maximum of 180 characters")
     name = models.CharField(unique=True, max_length=512)
     location = models.CharField(blank=True, null=True, max_length=100, choices=PROPERTY_LOCATIONS)
     active = models.BooleanField(default=True)

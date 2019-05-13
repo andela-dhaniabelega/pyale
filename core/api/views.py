@@ -41,20 +41,6 @@ class TenantDocumentList(generics.ListAPIView):
         pk = self.request.user.id
         return models.TenantDocument.objects.filter(tenant_id=pk, admin_only_access=False)
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        for item in queryset:
-            item.document = item.document.url
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
 
 class TenantBillsList(generics.ListAPIView):
     model = models.Letting
