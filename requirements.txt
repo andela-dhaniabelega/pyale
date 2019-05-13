@@ -27,6 +27,7 @@ django-storages==1.7.1
 -e git://github.com/darklow/django-suit.git@afcc506e94e5d4018da1ca6352b5b1718abb2f1c#egg=django_suit
 django-summernote==0.8.11.4
 django-timezone-field==3.0
+django-tinymce==2.8.0
 django-webpack-loader==0.6.0
 djangorestframework==3.9.0
 djangorestframework-jwt==1.11.0
