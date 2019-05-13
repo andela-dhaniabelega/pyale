@@ -298,9 +298,9 @@ class PropertyImage(DirtyFieldsMixin, models.Model):
             if self.image.size > MAX_UPLOAD_FILE_SIZE:
                 raise ValidationError({"image": "Maximum Image size is 5MB"})
 
-        current_tags = self.realty.property_images.values_list("tag", flat=True)
-        if "thumbnail" in current_tags and self.tag == 'thumbnail':
-            raise ValidationError({"tag": "A thumbnail image already exists."})
+        # current_tags = self.realty.property_images.values_list("tag", flat=True)
+        # if "thumbnail" in current_tags and self.tag == 'thumbnail':
+        #     raise ValidationError({"tag": "A thumbnail image already exists."})
 
     def delete(self, using=None, keep_parents=False):
         public_id = get_public_id_from_url(self.image.url)
