@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+{% block footer %}
+{#    </div> <!-- Put footer outside #container -->#}
+    {% if not is_popup %}
+        <div id="footer">
+        <footer class="footer">
+            <div class="container-fluid">
+                {% block footer_content %}
+                    <div class="row">
+
+                        <div class="col-xs-12 col-sm-3 footer-links">
+                            {% block footer_links %}
+                                <a href="http://djangosuit.com/support/" target="_blank"></a>
+                                <a href="http://djangosuit.com/pricing/" target="_blank"></a>
+                                <a href="https://docs.google.com/spreadsheets/d/1EvWBsRQGGEL_CN0wyIqBarG8taDdp-MdAsxOYxtRE_4/edit?usp=gmail" target="_blank">Report a bug</a>
+                            {% endblock %}
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6 text-sm-center footer-copyright">
+                            {% block copyright %}
+                                Copyright &copy;
+                                <span class="hidden-md-down">2019-</span>{% now "Y" %} Pyale Properties
+                                <br>
+                                <a href="http://djangosuit.com" target="_blank">www.pyaleproperties.com</a>
+                            {% endblock %}
+                        </div>
+
+                        <div class="col-xs-12 col-sm-3 text-sm-right footer-version">
+                            {% block footer_branding %}
+                                {% with admin_name=site_header|default:_('Django administration') django_version='django_version' %}
+                                    {{ admin_name }}
+                                    {% if admin_name == 'Django Suit' %}
+                                        <span style="font-size: 12px">
+
+                                        </span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endblock %}
+                        </div>
+
+                    </div>
+                {% endblock %}
+            </div>
+        </footer>
+    {% endif %}
+
+
+{% endblock %}

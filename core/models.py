@@ -174,39 +174,39 @@ class Property(models.Model):
     PROPERTY_LOCATIONS = (("lagos", "Lagos"), ("portharcourt", "Port Harcourt"))
 
     category = models.CharField(max_length=255, choices=PROPERTY_CATEGORIES)
-    # property_value = MoneyField(
-    #     max_digits=19,
-    #     decimal_places=2,
-    #     default_currency=settings.DEFAULT_CURRENCY,
-    #     blank=True,
-    #     null=True,
-    #     help_text="Value of Property in Naira",
-    # )
-    # current_rental_value = MoneyField(
-    #     max_digits=19,
-    #     decimal_places=2,
-    #     default_currency=settings.DEFAULT_CURRENCY,
-    #     blank=True,
-    #     null=True,
-    #     help_text="Rental Value of Property in Naira for current year",
-    # )
-    # rental_revenue = MoneyField(
-    #     max_digits=19,
-    #     decimal_places=2,
-    #     blank=True,
-    #     null=True,
-    #     default_currency=settings.DEFAULT_CURRENCY,
-    #     help_text="Payable Revenue on property in Naira for current year",
-    # )
+    property_value = MoneyField(
+        max_digits=19,
+        decimal_places=2,
+        default_currency=settings.DEFAULT_CURRENCY,
+        blank=True,
+        null=True,
+        help_text="Value of Property in Naira",
+    )
+    current_rental_value = MoneyField(
+        max_digits=19,
+        decimal_places=2,
+        default_currency=settings.DEFAULT_CURRENCY,
+        blank=True,
+        null=True,
+        help_text="Rental Value of Property in Naira for current year",
+    )
+    rental_revenue = MoneyField(
+        max_digits=19,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        default_currency=settings.DEFAULT_CURRENCY,
+        help_text="Payable Revenue on property in Naira for current year",
+    )
     year = models.CharField(max_length=100)
-    # net_revenue = MoneyField(
-    #     max_digits=19,
-    #     decimal_places=2,
-    #     blank=True,
-    #     null=True,
-    #     default_currency=settings.DEFAULT_CURRENCY,
-    #     help_text="Net Revenue is the difference between the Rental revenue and total running costs",
-    # )
+    net_revenue = MoneyField(
+        max_digits=19,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        default_currency=settings.DEFAULT_CURRENCY,
+        help_text="Net Revenue is the difference between the Rental revenue and total running costs",
+    )
     description = HTMLField()
     summary = models.TextField(max_length=180, help_text="Maximum of 180 characters")
     name = models.CharField(unique=True, max_length=512)
@@ -220,12 +220,12 @@ class Property(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.year = pendulum.now(tz="Africa/Lagos").year
 
-        # if self.rental_revenue and self.id:
-        #     running_cost = [
-        #         running_cost.amount_spent for running_cost in PropertyRunningCosts.objects.filter(realty_id=self.id)
-        #     ]
-        #     running_cost = sum(running_cost)
-        #     self.net_revenue = self.rental_revenue.amount - running_cost.amount
+        if self.rental_revenue and self.id:
+            running_cost = [
+                running_cost.amount_spent for running_cost in PropertyRunningCosts.objects.filter(realty_id=self.id)
+            ]
+            running_cost = sum(running_cost)
+            self.net_revenue = self.rental_revenue.amount - running_cost.amount
 
         super().save()
 

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 import datetime
 import os
+from distutils.util import strtobool
 
 import cloudinary
 import django_heroku
@@ -28,7 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = strtobool(os.environ.get('DEBUG'))
 
 ALLOWED_HOSTS = ['pyaleproperties.herokuapp.com', '127.0.0.1:8000', '127.0.0.1:3000']
 

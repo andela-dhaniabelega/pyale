@@ -31,22 +31,22 @@ class PropertyAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "category",
-        # "property_value",
-        # "current_rental_value",
-        # "rental_revenue",
-        # "net_revenue",
+        "property_value",
+        "current_rental_value",
+        "rental_revenue",
+        "net_revenue",
         "year",
     )
     search_fields = ["category"]
     list_filter = ("category",)
     fieldsets = (
-        # ("Valuation", {"fields": ("property_value", "current_rental_value", "rental_revenue", "net_revenue")}),
+        ("Valuation", {"fields": ("property_value", "current_rental_value", "rental_revenue", "net_revenue")}),
         (
             "Property Info",
             {"fields": ("category", "name", "summary", "description", "location", "active", "home_page")},
         ),
     )
-    # readonly_fields = ("net_revenue",)
+    readonly_fields = ("net_revenue",)
 
 
 class PropertyInventoryAdmin(admin.ModelAdmin):
