@@ -28,7 +28,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in production!!
 DEBUG = strtobool(os.environ.get('DEBUG'))
 
 ALLOWED_HOSTS = ['pyaleproperties.herokuapp.com', '127.0.0.1:8000', '127.0.0.1:3000']
