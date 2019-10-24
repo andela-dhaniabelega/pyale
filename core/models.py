@@ -471,13 +471,15 @@ class Letting(DirtyFieldsMixin, models.Model):
 
     def clean(self):
         super().clean_fields()
-        start_date = pendulum.datetime(self.start_date.year, self.start_date.month, self.start_date.day)
+        # start_date = pendulum.datetime(self.start_date.year, self.start_date.month, self.start_date.day)
+        # current_date = pendulum.now().date()
 
-        current_date = pendulum.now().date()
-
-        if self._state.adding and start_date.date() < current_date:
-            raise ValidationError({"start_date": "Letting start date cannot be earlier than current date:"})
-
+        # TODO: Uncomment this if requirements change.
+        # start_date = pendulum.datetime(self.start_date.year, self.start_date.month, self.start_date.day)
+        # current_date = pendulum.now().date()
+        # if self._state.adding and start_date.date() < current_date:
+        #     raise ValidationError({"start_date": "Letting start date cannot be earlier than current date:"})
+        
         if self.duration % 3 != 0 and self.schedule_type.lower() == self.QUARTERLY:
             raise ValidationError(
                 {"schedule_type": "Quarterly payment schedule is not suitable for specified letting duration"}
